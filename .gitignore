@@ -1,0 +1,19 @@
+# Cocos Creator generated caches / build outputs (when client/ exists)
+**/library/
+**/temp/
+**/local/
+**/build/
+**/node_modules/
+**/dist/
+**/.cache/
+# Local test evidence, secrets, and logs
+.local/
+.env
+.env.*
+!.env.example
+*.log
+*.pid
+*.pid.lock
+.DS_Store
+Thumbs.db
+# Keep assets and .meta files tracked; do not globally ignore *.meta
