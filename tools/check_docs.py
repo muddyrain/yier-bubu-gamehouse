@@ -37,8 +37,14 @@ def validate_links(markdown_file: Path, body: str) -> int:
     return count
 
 
+def markdown_paths(root: Path) -> list[Path]:
+    # Only authored documentation belongs to this contract, not dependencies,
+    # imported engine caches, or ignored local validation evidence.
+    return sorted([root / 'AGENTS.md', root / 'README.md', *(root / 'docs').rglob('*.md')])
+
+
 def main() -> int:
-    paths = sorted(ROOT.rglob('*.md'))
+    paths = markdown_paths(ROOT)
     link_count = 0
     for p in paths:
         body = p.read_text(encoding='utf-8')

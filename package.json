@@ -1,0 +1,14 @@
+{
+  "name": "yier-bubu-gamehouse-checks",
+  "private": true,
+  "version": "0.0.0",
+  "description": "CLI type checker only; Cocos Creator owns engine compilation and preview.",
+  "packageManager": "npm@11.17.0",
+  "engines": {
+    "node": "26.4.0",
+    "npm": "11.17.0"
+  },
+  "devDependencies": {
+    "typescript": "5.8.2"
+  }
+}

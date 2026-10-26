@@ -1,6 +1,7 @@
 # Cocos Creator generated caches / build outputs (when client/ exists)
 **/library/
 **/temp/
+**/profiles/
 **/local/
 **/build/
 **/node_modules/
@@ -16,4 +17,6 @@
 *.pid.lock
 .DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
 # Keep assets and .meta files tracked; do not globally ignore *.meta

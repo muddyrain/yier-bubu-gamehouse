@@ -1,17 +1,17 @@
 # 资源清单、依赖与项目风险
 
-> DOC-RESOURCES · v1.0 · 2026-10-26 · 仅项目准备目标，未代表软件/账号/授权现已具备。
+> DOC-RESOURCES · v1.2 · 2026-10-26 · 环境与收尾事实见 P1-01 报告；未列证据的后续资源仍为需求。
 
 ## P0 / P1 前期最小需要
 
 | 资源 | 必要性 | 状态与备注 |
 | --- | --- | --- |
-| 新的独立 Git 仓库 | 必需 | 已创建 [`muddyrain/yier-bubu-gamehouse`](https://github.com/muddyrain/yier-bubu-gamehouse)，文档仍待上传；与 `bubu-ai` 分离 |
-| Windows 调试环境 | **强烈建议** | 执行 Cocos 构建、GUI/微信开发者工具，避免影响 Mac |
-| Cocos Creator 3.8.8 | 必需 | P1 安装并锁版本、记录安装路径为本机配置 |
-| Node.js/包管理器 | 必需 | P1 根据 Cocos/工具兼容性定版本，不先写虚假命令 |
+| 新的独立 Git 仓库 | 必需 | [`muddyrain/yier-bubu-gamehouse`](https://github.com/muddyrain/yier-bubu-gamehouse) 使用 master，文档基线为 `043ae7f`；P1-01 本次获授权提交/推送，见 [收尾报告](reports/2026-10-26_issue-1_closeout.md) |
+| Windows 调试环境 | **强烈建议** | 已有 Startup 1280×720、4:3、21:9 实际图形证据，见 [横屏验收报告](reports/2026-10-26_issue-1_landscape-gui-acceptance.md)；正式产品/微信真机未验证 |
+| Cocos Creator 3.8.8 | 必需 | 经用户授权安装官方包并验证签名/版本；路径仅留本机 `.local/environment.json` |
+| Node.js/包管理器 | 必需 | 已实测 Node 26.4.0 / npm 11.17.0；依赖与类型检查见 TECH_STACK |
 | 一二/布布角色参考与授权证明 | 正式发布前必需 | 当前不视为已获商业使用许可 |
-| 临时原创占位素材 | P1 必需 | 优先用简单形状/原创占位图 |
+| 临时原创占位素材 | P1 必需 | 已有同规格白/棕矩形与文字；无正式角色图像/动作 |
 | 微信小游戏 AppID / 开发者工具 | P4 联调前需要 | 账号主体和审核另行处理 |
 | 至少两台手机 / 两个测试账号 | P5 需要 | 验证好友开房与重连 |
 | 云服务器、WSS、持久化数据库 | P5 才需要 | P1 不部署正式服务器 |

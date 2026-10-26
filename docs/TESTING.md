@@ -1,6 +1,6 @@
 # 验证分层、证据与发布质量门槛
 
-> DOC-TEST · v1.0 · 2026-10-26 · 测试脚本尚未建立，不代表任何游戏已通过。
+> DOC-TEST · v1.7 · 2026-10-26 · P1-01 安全 CLI 与 Windows Startup 横屏图形复验已有证据；具体执行结果在报告，不代表正式游戏或真机通过。
 
 ## 1. 分层测试
 
@@ -22,6 +22,7 @@
 
 ## 3. 初始功能验收门槛
 
+- 横屏：大厅、选角、各游戏和未来房间方向一致；以 1280×720 为设计基准检查 16:9、4:3、超宽屏布局与安全区，不通过拉伸玩法坐标或动态旋转规避适配。对应功能实施时再做真实验证。
 - 大厅：四款游戏入口占位或已实现入口区分准确，返回不会残留音频/定时器。
 - 角色：一二白熊、布布棕熊，选角结果进入游戏，无默认布布绑定。
 - 存档：退出和重新启动可恢复已保存进度，旧 schemaVersion 可迁移或清楚拒绝。
@@ -45,6 +46,53 @@
 - 日志写在项目下 `.local/validation/<task-id>/`，默认不提交；必要证据复制到经过授权的报告位置。
 - Mac CLI 测试有时限、非常驻、结束后确认自身子进程退出；不能凭一个未退出的后台命令称通过。
 - Windows GUI 测试结束关闭自己启动的调试进程和模拟器，不干预无关窗口。
+
+### P1-01 已实现入口与副作用审阅
+
+从仓库根执行 `python -B tools/validate.py <检查名>`，Mac 用 `python3`。每轮记录实际 OS/Python、单项结果/退出码/耗时，并输出 `.local/validation/p1-01/<UTC时间>/summary.json` 和日志。
+
+| 检查名 | 固定子进程 | 预算 | 副作用 |
+| --- | --- | --- | --- |
+| `docs` | 当前 Python，`-B tools/check_docs.py` | 30 秒 | 仅读自有 Markdown；不联网、不导入游戏 |
+| `unit` | 当前 Python，标准库 unittest discover；原 Git 检出中另有只读 `git check-ignore -v --stdin -z` 与 `git ls-files`（各 10 秒上限） | 30 秒 | 临时目录及短时 CLI 子进程；含 0.1 秒超时终止测试，无引擎/浏览器 |
+| `typecheck` | Node，已安装 TypeScript 的 `tsc.js --project client/tsconfig.json --noEmit` | 60 秒 | 只读源码和真实引擎声明，不生成代码，不启动编辑器 |
+| `all` | 以上三项串行 | 合计 120 秒 | 不含安装、构建或预览 |
+
+检查入口没有自由 shell 命令参数，不执行 package scripts，`shell=False`；允许任意 OS 执行的只有该 CLI 白名单。未知 OS 仍不引入 GUI 路径。超时由 `subprocess.run` 终止并等待自己启动的子进程；固定生产命令不派生引擎、浏览器或常驻服务。日志写入是检查入口唯一持久副作用；文档检查器本身仍只读。
+
+单项 `passed` 对应退出码 0，执行失败为 `failed` 并保留实际码，缺文件/可执行程序为 `blocked` / 2，超时为 `failed` / 124。外层遇失败返回 1，仅有阻塞返回 2，全通过返回 0。预检包括本地 `tsc.js`、生成的 `tsconfig.cocos.json`、四份声明 `cc/cc.env/cc.custom-macro/jsb.d.ts`；任何一项缺失时不启动 Node，不生成替代类型，不调用 Cocos 补齐。存在但引用已失效的声明仍可能导致 tsc failed，不能隐瞒为通过。
+
+复审准备将一次性检查中的 meta 完整性/唯一性/孤立项、场景对象索引与 SmokeTest 引用、引擎版本和 Git 忽略边界纳入 `tools/tests/test_project_baseline.py`。脚本引用从当前 `.meta` 推导完整/压缩 UUID，不写死某次生成的 UUID。机器路径/敏感内容检查保留为每次导出审查包的检查，不能以匹配某台机器的固定路径代替通用检查。
+
+F-01 回归把 `client/settings/v2/packages/cocos-service.json`、`information.json` 纳入应忽略路径。检查时通过单次命令 `-c core.excludesFile=` 禁用全局忽略，并断言 verbose 来源必须为根或 client 的 `.gitignore`，防止 `.git/info/exclude` 或用户配置掩盖缺失规则；另用 `git ls-files` 断言两份配置未进入索引。上述参数不写入任何 Git 配置。共享 project/engine 配置和资产/meta 仍须可追踪；测试不改写被检查配置。
+
+没有 `.git` 的审查 ZIP 中，Git 忽略测试明确 skip，其余单元与静态测试不依赖 Git/Cocos/Node。回归测试仅读取场景/meta，并不执行游戏生命周期、像素渲染或正式玩法。Mac 安全性是本轮对脚本及其子进程的源码复核结论，Mac 实机运行结果仍为 not_run。
+
+Windows 的临时编辑器扩展属于 T3 引擎数据操作，不在安全 CLI 白名单中；即便不显示窗口也不能移到 Mac 执行。P1-01 用户要求后台工作后停止前台自动化，没有用隐藏窗口结果替代画面验收。场景反序列化后显式调用脚本的成功不能代替运行时自动 `start()`、触控、绘制或退出检查。
+
+### P1-01 旧竖屏 AC-02 Windows 图形运行验收（历史）
+
+横屏变更前的验收轮次曾另获用户明确许可：可使用 Windows 前台调试并保存仅项目窗口截图。使用现有 3.8.8 打开 `client/` 的 `Startup.scene`，选择 **Preview in Editor**，运行 → 停止返回 Scene → 再次运行 → 再次停止，最后正常关闭编辑器。当时没有重建工程、改场景/脚本或显式调用 `start()`。
+
+两次实际运行均显示标题、六个文字节点和同规格白/棕几何占位；各自动输出一次 SmokeTest 启动日志。预览控件为 Design Resolution (720x1280)，以 Fit to current view 的 67% 缩放完整显示；100% 时小面板不能容纳完整画布，属于本次观察到的查看范围限制。脚本错误计数为 0；停止后的 IPC 警告、启动时 Widget/计时诊断保留在原始日志中，未阻断两次运行，原因未进一步定位。
+
+[Windows 图形验收报告](reports/2026-10-26_issue-1_windows-gui-acceptance.md) 记录逐项结果、截图和进程退出证据。此处 AC-02 指 Issue #1 的运行验收，不等于 FEAT-012 AC-02 的正式美术/动作验收。FPS 输入框的 60 是设置值，不能用作实测性能；微信真机、Mac 实机 CLI、触控及正式玩法均未执行。
+
+### P1-01 横屏基线与 Windows 图形复验
+
+[横屏开发报告](reports/2026-10-26_issue-1_landscape-baseline.md) 与 [ADR-0003](decisions/ADR-0003-landscape-first.md) 定义新基线。`test_project_baseline.py` 包含独立断言：项目默认 1280×720、Fit Width/Height=true；现有 Canvas 内容尺寸/中心/锚点、启用且关联的正交相机及半高 360。引用测试同时断言 scene UUID 对应当前 meta、Canvas 恰有一个启用的 SmokeTest 且其 node 指回 Canvas。全部仅读 JSON，不导入或模拟引擎。
+
+旧配置曾使两项新增回归失败，修改后安全 CLI 通过；基线开发轮次未获 GUI 许可，因此当时仅证明配置/引用。随后用户确认外部静态复审通过，并明确许可本轮 Windows 前台调试及仅项目窗口截图；[横屏图形验收报告](reports/2026-10-26_issue-1_landscape-gui-acceptance.md) 另行记录新证据，不复用旧竖屏画面。
+
+实际使用 Preview in Editor 的 Design Resolution (1280×720)，以及旋转后的 iPad 10.2（2160×1620，4:3）、Sony Xperia 5（840×360，21:9）预设。三种比例均完整显示标题、六个文字节点与左白/右棕同规格占位，未观察到裁切、重叠或错位；4:3 上下、21:9 左右额外黑色留空与原黑背景同色，接受留边。设备预设不等于真实手机。
+
+运行 → 停止 → 再运行 → 再停止均成功，两次各自动输出一个 SmokeTest 标记；没有手工调用 start。最后恢复设计分辨率横向预览。控制台错误计数 0，停止后 IPC 警告累计 3 条，stdout 另有 16 条计时诊断；均保留原始日志，未定位根因，不写成引擎日志完全无错误/警告。正常关闭本轮编辑器后，同路径引擎进程及已记录子进程均为 0。
+
+后续微信构建需检查 Landscape 及实际 `game.json`；Mac 实机 CLI、微信构建/真机、安全区、触控与性能仍为 `not_run`。FPS 输入值和查看缩放百分比不能作为性能测量。
+
+### P1-01 最终复审与提交前检查
+
+用户最终复审已接受基础工程、F-01、横屏基线和三比例运行证据；本次收尾按原入口重新执行文档、13 项回归、TypeScript，以及编码、敏感内容、逐文件暂存差异和忽略规则检查，实际结果见 [收尾报告](reports/2026-10-26_issue-1_closeout.md)。本轮禁止重新运行 GUI，图形结论引用已有独立报告；所有历史失败、旧竖屏证据、原审查包及引擎诊断保留。Mac 实机、微信构建/真机、安全区、触控、性能与冷检出/第二台机器复现仍未验证。
 
 ## 6. 性能与发布
 

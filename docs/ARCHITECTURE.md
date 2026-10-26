@@ -1,6 +1,6 @@
 # 目标系统架构与依赖边界
 
-> DOC-ARCH · v1.0 · 2026-10-26 · **仅为计划架构，不代表已实现**。
+> DOC-ARCH · v1.5 · 2026-10-26 · 目标模块仍为计划；P1-01 的实际工程与横屏边界见第 2 节。
 
 ## 1. 分层与模块图（目标）
 
@@ -23,7 +23,33 @@ multiplayer/     (预留抽象；P5 才接真实 WSS)
 shared-protocols/(若 P5 需共用网络数据契约)
 ```
 
-## 2. 计划工程目录（P1 时再落地）
+## 2. 实际工程与目标目录
+
+P1-01 当前实际存在：
+
+```text
+client/                              # 官方 3.8.8 Empty(2D) 模板派生工程
+  assets/scenes/Startup.scene         # 官方 2D 预设，经实际引擎序列化保存
+  assets/scripts/SmokeTest.ts         # Canvas 上的最小启动探针
+  .creator/default-meta.json          # 官方模板的导入约定
+  settings/                          # 真实模板派生配置，本轮调整为 1280×720
+  tsconfig.json                      # 继承不提交的 temp/tsconfig.cocos.json
+tools/validate.py                    # 固定 CLI 白名单、OS 记录、时限、退出码、日志
+tools/check_docs.py                  # 仅扫描自有文档，排除依赖/缓存
+tools/tests/test_validation.py       # 检查工具的纯逻辑与受控子进程回归测试
+tools/tests/test_project_baseline.py # 无引擎的 meta/场景引用/版本/忽略边界回归
+package.json / package-lock.json     # 外部 TypeScript 检查器；不是引擎运行依赖
+```
+
+`SmokeTest` 在运行时 `start()` 中创建六个文字节点和两个同规格矩形，一二白色、布布棕色。没有选角、目录、存档、导航、网络或后台服务。临时 Windows 编辑器扩展用于实际调用引擎序列化/反序列化，任务后已移入 `.local/` 证据目录，不随工程自动运行。
+
+初始后台引擎探针在编辑器场景环境显式调用 `start()`，只证明数据与 API 可执行。后续独立进行的 [Windows 图形验收](reports/2026-10-26_issue-1_windows-gui-acceptance.md) 已在 Preview in Editor 中两次观察到运行时自动触发 `start()`、双角色几何占位和 720×1280 布局；没有改变场景或脚本，不扩展为正式游戏/微信运行结论。
+
+上述为**修改前竖屏历史证据**。[横屏基线开发](reports/2026-10-26_issue-1_landscape-baseline.md) 按 [ADR-0003](decisions/ADR-0003-landscape-first.md) 调整 project 默认分辨率与现有 Startup：Canvas UITransform 1280×720、中心 (640, 360)、相机半高 360，Fit Width/Height 同时开启；保留所有对象 ID、Meta UUID、Canvas/Widget/相机/SmokeTest 引用。双矩形横向位置为 ±260、双方名称区域宽度为 320，继续由原 start 创建内容并记录原日志标记。本轮未修改这些文件，实际引擎加载、16:9/4:3/21:9 显示及两次自动启动/停止证据见 [横屏图形验收报告](reports/2026-10-26_issue-1_landscape-gui-acceptance.md)。
+
+统一方向适用于后续 App Shell、选角、小游戏与房间；窄高玩法在横屏内使用独立玩法容器与外围 UI，不在游戏切换时旋转。此为布局约束，没有新增相关模块或接口。
+
+以下为后续目标，尚未创建：
 
 ```text
 client/                  # Cocos Creator 项目
@@ -38,7 +64,7 @@ shared/                  # 只有出现真实共享类型时建立
 scripts/                 # 检查/构建脚本，经安全审查才执行
 ```
 
-**不得只为符合架构图而创建大量空文件。** 当前仅有本项目文档包，不存在 `client/` 等目录。
+**不得只为符合架构图而创建大量空文件。** 当前没有上述 `core/characters/platform/games/ui`、`server/`、`shared/` 或 `scripts/` 产品模块；安全工具实际放在 `tools/`。
 
 ## 3. 关键契约（语义级，P1 再确定 TS 签名）
 

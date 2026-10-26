@@ -1,6 +1,8 @@
 # Feature 总表、编号与实施状态（唯一 Feature 状态源）
 
-> DOC-FEATURES · v1.0 · 2026-10-26。**下列状态均是计划，不代表有代码或已运行。** 单项详见 `docs/features/`。
+> DOC-FEATURES · v1.2 · 2026-10-26。状态按功能全部验收范围填写；工程启动测试不代表正式大厅或游戏实现。单项详见 `docs/features/`。
+
+全项目首发界面统一横屏，以 1280×720 为设计基准，暂不做单游戏动态旋转，见 [ADR-0003](decisions/ADR-0003-landscape-first.md)。本次基线变更不改变以下 Feature 实施状态。
 
 | ID | 功能与详情 | 优先级 | 阶段 | 状态 | 依赖 |
 | --- | --- | --- | --- | --- | --- |
@@ -15,7 +17,7 @@
 | FEAT-009 | [公共奖励与小屋](features/FEAT-009-shared-progression.md) | P1 | P4 | `planned` | 004 |
 | FEAT-010 | [微信平台适配](features/FEAT-010-wechat-platform.md) | P0 | P1/P4 | `planned` | 001–004 |
 | FEAT-011 | [好友房、选角与联机](features/FEAT-011-multiplayer-room.md) | P1 | P5 | `planned` | 002、003、006、010 |
-| FEAT-012 | [素材与发布质量](features/FEAT-012-asset-and-quality.md) | P0 | P1–P4 | `planned` | 关联 001、002、010（分阶段） |
+| FEAT-012 | [素材与发布质量](features/FEAT-012-asset-and-quality.md) | P0 | P1–P4 | `in_progress` | 关联 001、002、010（分阶段） |
 
 优先级说明：P0 = 建立可用骨架/核心玩法所必需；P1 = 首发完整内容或重要延伸；P2 = 后续探索。阶段整体状态唯一记录于 `PLAN.md`，这里仅记录**功能自身状态**。
 
