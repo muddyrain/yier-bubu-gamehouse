@@ -88,4 +88,4 @@ python3 -B tools/validate.py typecheck
 
 ## 本轮交付边界
 
-**P1-01 / Issue #1** 仍为 `in_progress`，停止等待最终验收复审。用户已确认 [横屏基线](docs/reports/2026-10-26_issue-1_landscape-baseline.md) 的外部静态 Code Review 通过；本轮另获具体许可，完成 [Windows 横屏图形复验](docs/reports/2026-10-26_issue-1_landscape-gui-acceptance.md)，仅保存项目窗口证据，编辑器已关闭。[F-01 修复](docs/reports/2026-10-26_issue-1_config-ignore-fix.md)、旧竖屏报告与原审查包保留。Mac/微信真机与性能未验证；没有修改玩法、重建工程、提交或推送。
+**P1-01 / Issue #1** 已获用户最终复审接受；任务与阶段状态唯一见 [PLAN](docs/PLAN.md)。[横屏基线](docs/reports/2026-10-26_issue-1_landscape-baseline.md)、[Windows 三比例图形复验](docs/reports/2026-10-26_issue-1_landscape-gui-acceptance.md) 和 [F-01 修复](docs/reports/2026-10-26_issue-1_config-ignore-fix.md) 均有独立证据，旧竖屏报告与原审查包保留。按本次明确授权完成安全检查、提交/推送及 Issue 收尾，详见 [收尾报告](docs/reports/2026-10-26_issue-1_closeout.md)；本轮不重跑 GUI、不改玩法、不重建工程。Mac/微信真机与性能仍未验证，完成后停止，不开始 P1-02。
