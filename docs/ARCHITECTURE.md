@@ -1,6 +1,6 @@
 # 目标系统架构与依赖边界
 
-> DOC-ARCH · v1.5 · 2026-10-26 · 目标模块仍为计划；P1-01 的实际工程与横屏边界见第 2 节。
+> DOC-ARCH · v1.9 · 2026-10-28 · 目标模块仍为计划；P1-02 已通过最终复审并获专项验收，真实游戏生命周期及 FEAT-001 AC-03 仍待集成。
 
 ## 1. 分层与模块图（目标）
 
@@ -49,7 +49,17 @@ package.json / package-lock.json     # 外部 TypeScript 检查器；不是引�
 
 统一方向适用于后续 App Shell、选角、小游戏与房间；窄高玩法在横屏内使用独立玩法容器与外围 UI，不在游戏切换时旋转。此为布局约束，没有新增相关模块或接口。
 
-以下为后续目标，尚未创建：
+### P1-02 独立大厅实现
+
+实际新增 `assets/scenes/Lobby.scene`、`assets/scripts/LobbyModel.ts`、`LobbyView.ts` 及对应 Meta；没有迁移或改写 Startup、SmokeTest、原 Meta、共享 project/engine 设置。Lobby 源场景沿用现有真实 Scene/Canvas/Widget/Camera 结构，使用独立 UUID 和 LobbyView 组件引用。源码开发轮次未运行编辑器；后续真实 3.8.8 导入只将三份新 Meta 的 imported 改 true，UUID 不变。前次暂缓见 [导入报告](reports/2026-10-27_issue-2_windows-gui-import.md)；本轮明确恢复后完成运行与交互，见 [GUI 验收报告](reports/2026-10-27_issue-2_windows-gui-acceptance.md)。
+
+- LobbyModel 不导入 cc：只读 GameCatalogEntry、角色身份、1280×720 中心参照布局、等比 fit、单面板导航和焦点索引。四款均 coming-soon，没有实现 GameModuleRegistry 或可玩入口。
+- LobbyView 是 Canvas 上唯一大厅组件：onLoad 一次构建首页和一个提示面板；onEnable 配对订阅按钮、尺寸和键盘事件；onDisable 解除同一批订阅并复位；onDestroy 仅在 `isValid(root, true)` 时释放自建根节点，避免场景先销毁子节点后再次 destroy 的真实警告。打开/关闭提示只改可见性和文本，不创建新节点/回调。
+- 提示激活时覆盖输入并禁用大厅按钮；返回/Escape 回到首页，Tab/方向键/Enter/Space 用于基础键盘导航。本轮真实鼠标、遮罩和运行时组件恢复已验证；独立可视本地预览在 GameCanvas 聚焦后验证键盘，编辑器外层焦点未响应的历史失败保留。触控/安全区仍未验证，没有为测试伪造引擎。
+- 设计容器按 Canvas 尺寸整体等比缩放，保留双主角区域和 2×2 目录相对关系，接受留边；手机系统安全区适配未实现/验证。
+- 后续 FEAT-002/003 应从稳定 GameId/CharacterId 和明确的导航动作接入。本轮不写入 selectedCharacter、不加载子游戏、不读写存档或联网；好友只显示未开放说明。
+
+原 13 项测试不改，新增资源引用检查及直接执行真实纯 TS 模型的逻辑回归；纯逻辑返回 HOME 不代表真实场景往返、UI 无泄漏或真实触控已验收。入口与证据见 [P1-02 报告](reports/2026-10-27_issue-2_landscape-lobby.md)。下面仍是后续目标，未新增空目录：
 
 ```text
 client/                  # Cocos Creator 项目

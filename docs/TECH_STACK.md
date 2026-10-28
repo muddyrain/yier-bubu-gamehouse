@@ -1,6 +1,6 @@
 # 技术选型与版本策略
 
-> DOC-TECH · v1.5 · 2026-10-26 · P1-01 使用 1280×720 横屏基线，Windows Startup 三种比例与停止/重启已有图形证据；Mac 实机与微信真机尚未验证。
+> DOC-TECH · v1.8 · 2026-10-27 · P1-01 横屏 Startup 已验收；P1-02 沿用同一引擎/依赖，Windows Lobby 三比例/交互/启停已实测，诊断见 GUI 报告；Mac/微信真机未验证。
 
 | 层 | 选择 | 理由 / 注意事项 |
 | --- | --- | --- |
@@ -10,6 +10,7 @@
 | 日常开发 | Codex + 编辑器（Windows 可 GUI） | Mac 默认 CLI 文件编辑与审查 |
 | 外部 CLI | Node.js **26.4.0** / npm **11.17.0** | 使用本机现有版本并实际验证 tsc；不是引擎内嵌 Node 的版本，也不推定其他 Node 版本已验证 |
 | 工具逻辑测试 | Python **3.13.5** 标准库 unittest | 检查入口、失败码、缺依赖、超时终止和文档扫描边界；无额外测试库 |
+| 大厅逻辑测试 | 现有 Node + TypeScript 的 transpileModule + node:assert | 只在内存执行无 cc 导入的 LobbyModel；10 秒子进程预算，挂入原 unit，未增加依赖/安装脚本；真实 tsc 另做类型检查 |
 | 版本管理 | Git / GitHub | 独立仓库、短分支、Issue 与评审 |
 | 平台入口 | 微信小游戏 SDK，经 PlatformAdapter 隔离 | 分享、登录、生命周期由适配层处理 |
 | 单机存档 | 可替换的 SaveRepository，最初本地持久化 | schemaVersion 与数据迁移 |

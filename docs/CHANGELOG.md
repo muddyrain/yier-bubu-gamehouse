@@ -1,9 +1,14 @@
 # 文档与产品决策变更记录
 
-> DOC-CHANGELOG · v1.7 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
+> DOC-CHANGELOG · v1.12 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
 
 | 日期 | 类型 | 影响文件 | 原因与变化 | 验证/待验证 |
 | --- | --- | --- | --- | --- |
+| 2026-10-28 | P1-02-closeout | README、PLAN、FEAT-001、ARCHITECTURE、TESTING、INDEX、收尾报告及全部已审查 P1-02 项目文件 | 用户完整外部复审通过并接受任务范围，本次授权最终安全检查、逐文件暂存、提交/推送 origin/master，确认远端后关闭 Issue #2；P1-02 done，P1/FEAT-001 继续 in_progress，AC-03 待 FEAT-003 | 已审查 ZIP 的 79 文件/23 变更逐字节吻合，无额外改动；15 回归/tsc/文档/编码/暂存/私有忽略核对见报告，本轮 GUI not_run，历史诊断保留，不开始 P1-03 |
+| 2026-10-27 | P1-02-final-review-preparation | PLAN、INDEX、本次复审准备报告；本机生成完整源码 ZIP/清单/diff/SHA-256 | 保留现有全部成果，包含 GUI 期间的节点销毁修复、原测试及真实生命周期回归用例/证据摘要；完整差异覆盖未跟踪新增文件，按白名单排除私人配置/缓存/依赖/原始本机证据 | 安全 CLI 与导出副本检查见报告；导出 typecheck 缺真实生成声明/依赖为 blocked，GUI 本轮 not_run；P1-02 继续 in_progress，无 Git 写入 |
+| 2026-10-27 | P1-02-gui-acceptance | LobbyView.ts、README、PLAN、FEAT-001、ARCHITECTURE、TECH_STACK、TESTING、INDEX、GUI 验收报告 | 用户明确恢复前台操作；完成三比例、七入口各三次、键盘/鼠标/遮罩/组件恢复；真实停止警告增加 isValid 严格有效性检查，保留 Scene/Meta/P1-01 | 脚本刷新后两次启停与 CLI passed；前两次销毁警告、嵌入焦点失败、退出 IPC/WebContents/计时诊断及前次 not_run 均保留；进程已退出，待最终复审，无 Git 写入/新功能 |
+| 2026-10-27 | P1-02-gui-import-paused | 三份 Lobby Meta、README、PLAN、FEAT-001、ARCHITECTURE、TECH_STACK、TESTING、INDEX、导入报告 | 外部第一轮静态复审通过；经本次许可真实 3.8.8 打开 Lobby、识别 LobbyView，只将新 Meta imported 改 true 且 UUID 保留；用户随后要求稍后再做，已正常退出本轮进程 | 导入/识别 passed；预览、三比例、重复交互/键盘/遮罩/组件恢复 not_run；保留 4 条计时诊断，0 项目截图；CLI/保留检查见报告，P1-02 in_progress，无 Git 写入/新功能 |
+| 2026-10-27 | P1-02-landscape-lobby | Lobby.scene/Meta、LobbyModel/LobbyView/Meta、两份新测试、README、PLAN、FEATURES、FEAT-001、ARCHITECTURE、ART_ASSETS、ASSET_LICENSES、TECH_STACK、TESTING、INDEX、任务报告 | 新增独立 1280×720 大厅源码：同规格白/棕双主角、四款开发中目录、单提示返回、帮助/设置说明/好友预告；原 Startup/SmokeTest/Meta/settings/13 回归不改，不实现选角/游戏/存档/联网 | 安全 CLI/15 unittest（含 9 组 Node 纯模型断言）与保留/忽略检查见报告；新场景/Meta 为手工源码派生，真实编辑器导入/GUI not_run；FEAT-001/P1-02 in_progress，停止 Code Review，无 Git 写入 |
 | 2026-10-26 | P1-01-closeout | README、PLAN、TESTING、RESOURCES、FEAT-012、INDEX、收尾报告及本次全部已验收工程/测试/文档 | 用户最终复审接受基础工程、F-01、横屏基线和 Windows 三比例验收，明确授权最终检查后提交/推送 origin/master 并关闭 Issue #1；P1-01 标 done，P1/FEAT-012 继续 in_progress | 最终安全检查实际结果见收尾报告；私有配置/缓存/日志不入库，保留历史失败及竖屏记录；本轮无 GUI，Mac/微信真机/性能仍 not_run；停止，不开始 P1-02 |
 | 2026-10-26 | P1-01-landscape-gui-acceptance | README、PLAN、TESTING、TECH_STACK、ARCHITECTURE、FEAT-012、REFERENCES、INDEX、横屏图形报告 | 用户确认横屏外部静态复审通过并另予本次前台/项目截图许可；现有 3.8.8 完成 16:9/4:3/21:9、两次自动启动和停止，正常关闭并保留 IPC/计时诊断；未改场景/脚本/配置 | 新项目截图、原始日志、CLI/忽略及原成果保留检查见报告；无阻断性脚本错误，Mac/微信真机/性能 not_run；保持 in_progress，停止待最终复审，无 Git 写入 |
 | 2026-10-26 | P1-01-landscape-baseline | project.json、Startup.scene、SmokeTest.ts、工程静态测试、ADR-0003、PRODUCT、README、PLAN、TECH_STACK、ARCHITECTURE、FEATURES/受影响 Feature、MULTIPLAYER、TESTING、REFERENCES、INDEX、本轮报告 | 用户确认全项目横屏优先；默认配置与既有 Canvas 分别改为 1280×720，双占位对称、保留 Meta/对象 ID/生命周期，新增两项横屏静态回归；窄高玩法在横屏内布局 | CLI 实际结果见报告；本轮无 GUI，新横屏复验 not_run；旧竖屏报告/截图保留，P1-01 in_progress，停止待 Code Review，无 Git 写入 |

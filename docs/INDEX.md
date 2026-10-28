@@ -1,6 +1,6 @@
 # 文档导航与单一职责
 
-> DOC-INDEX · v1.7 · 2026-10-26 · 状态：维护中。**禁止新增多个文件维护同一事实**。
+> DOC-INDEX · v1.12 · 2026-10-28 · 状态：维护中。**禁止新增多个文件维护同一事实**。
 
 | 文件 | 唯一职责 | 更新触发条件 |
 | --- | --- | --- |
@@ -34,6 +34,11 @@
 | [P1-01 横屏基线报告](reports/2026-10-26_issue-1_landscape-baseline.md) | 本轮横屏配置/布局、UUID 保留、静态回归及 GUI 未执行边界 | Issue #1 横屏优先变更与后续复验 |
 | [P1-01 横屏图形验收报告](reports/2026-10-26_issue-1_landscape-gui-acceptance.md) | 本轮许可下的三种横屏比例、自动生命周期、停止/重启、诊断与进程清理证据 | Issue #1 横屏图形复验与最终复审 |
 | [P1-01 收尾报告](reports/2026-10-26_issue-1_closeout.md) | 用户最终复审结论、完整提交范围、最终安全 CLI 及敏感配置保护证据 | Issue #1 获授权提交/推送/关闭前的收尾检查 |
+| [P1-02 大厅开发报告](reports/2026-10-27_issue-2_landscape-lobby.md) | 独立大厅源码、目录/身份/导航测试、原基线保留及待许可的真实图形验收边界 | Issue #2 开发与 Code Review 交付 |
+| [P1-02 Windows 导入与暂停报告](reports/2026-10-27_issue-2_windows-gui-import.md) | 真实导入/Meta/组件识别、用户暂缓余下 GUI、诊断/退出及 CLI 证据 | Issue #2 获许可后的实际导入与未完成运行验收 |
+| [P1-02 Windows GUI 验收报告](reports/2026-10-27_issue-2_windows-gui-acceptance.md) | 恢复许可后的三比例、21 次交互、键盘/遮罩/组件恢复、销毁修复及启停/清理/CLI 证据 | Issue #2 剩余 GUI 验收与最终 Code Review |
+| [P1-02 最终复审准备报告](reports/2026-10-27_issue-2_final-review-preparation.md) | 完整源码 ZIP、含新增文件的 Git 差异、SHA-256、脱敏测试结果及覆盖缺口 | Issue #2 最终 Code Review 材料整理，不构成提交授权 |
+| [P1-02 收尾报告](reports/2026-10-28_issue-2_closeout.md) | 用户最终验收/本次 Git 授权、23 路径审查包一致性、安全检查与提交边界 | Issue #2 最终安全检查、获授权入库及远端确认后关闭 |
 
 ## 阅读流程
 

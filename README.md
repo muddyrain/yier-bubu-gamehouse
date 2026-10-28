@@ -1,6 +1,6 @@
 # 一二布布游戏屋（Yier & Bubu Gamehouse）
 
-> 更新日期：2026-10-26。当前阶段以 [PLAN.md](docs/PLAN.md) 为准；全项目首发横屏优先。P1-01 的 1280×720 Startup 已完成 Windows 横屏图形复验，没有正式游戏玩法。
+> 更新日期：2026-10-28。当前阶段以 [PLAN.md](docs/PLAN.md) 为准；全项目横屏优先。P1-01/P1-02 已获用户验收，P1 整体与 FEAT-001 继续 in_progress；四款游戏均开发中。
 
 一款以 **一二（小白熊）** 和 **布布（小棕熊）** 为平等双主角的微信小游戏合集。定位是「1 款有深度的精品主游戏 + 若干可反复游玩的经典玩法 + 统一大厅及成长」，未来支持邀请微信好友、创建双人房、选择角色、合作或对战。
 
@@ -17,11 +17,12 @@
 
 ## 工程入口
 
-1. 文档基线为 `master` 的 `043ae7f`；P1-01 已通过用户最终复审，本次获授权提交并推送，安全检查及范围见 [收尾报告](docs/reports/2026-10-26_issue-1_closeout.md)。实际阶段仍以 PLAN 为准。
-2. 工程目录是 `client/`，来自 **Cocos Creator 3.8.8 / Empty(2D)** 官方安装包模板。入口是 `client/assets/scenes/Startup.scene`，Canvas 挂载 `SmokeTest`。
-3. 场景使用标题、白/棕矩形与双方名称作启动占位，设计分辨率为 **1280×720**；Project Settings 与既有 Canvas 已分别调整，Fit Width/Height 同时开启以完整显示内容。全项目方向及代价见 [ADR-0003](docs/decisions/ADR-0003-landscape-first.md)，不含正式选角、目录、存档或玩法。
-4. 获得当次图形调试许可后，Windows 使用 **3.8.8** 打开 `client/`，双击 `assets/scenes/Startup.scene`，选择 **Preview in Editor** 后运行当前场景，用 Fit to current view 查看完整画布并比较不同宽高比。本轮 16:9、4:3、21:9 和两次运行/停止的证据见 [横屏图形验收报告](docs/reports/2026-10-26_issue-1_landscape-gui-acceptance.md)；[旧竖屏报告](docs/reports/2026-10-26_issue-1_windows-gui-acceptance.md) 继续作为历史保留。
-5. Agent 从 `AGENTS.md` 开始阅读；功能编号和验收见 `docs/FEATURES.md` 与 `docs/features/`。完整证据见 [P1-01 报告](docs/reports/2026-10-26_issue-1_cocos-initialization.md)。
+1. P1-01 已验收并入库，最终基线为 `0b4bf91`，见 [收尾报告](docs/reports/2026-10-26_issue-1_closeout.md)。P1-02 完整源码复审通过并获本次提交/推送/关闭 Issue 授权，审查包一致性与最终检查见 [P1-02 收尾报告](docs/reports/2026-10-28_issue-2_closeout.md)。
+2. 继续使用 **Cocos Creator 3.8.8 / Empty(2D)** 派生的 `client/`。大厅入口为新增 `client/assets/scenes/Lobby.scene`，Canvas 挂载 `LobbyView`；原 `Startup.scene` / `SmokeTest` 保持原字节，作为 P1-01 独立回归入口。
+3. 大厅沿用 **1280×720** 横屏和完整显示策略，同规格展示白熊一二、棕熊布布，四款卡片全部标“开发中”。可查看介绍、帮助/设置说明和好友预告，单面板关闭返回；隐藏继续按钮，不做选角、存档、可玩游戏或房间。方向及留边取舍见 [ADR-0003](docs/decisions/ADR-0003-landscape-first.md)。
+4. 既有 Windows **3.8.8** 已实际导入 Lobby、识别 LobbyView，三份新 Meta imported=true 且 UUID 不变。前次许可下的 **Preview in Editor** 完成三比例、七入口重复交互、遮罩、组件恢复与启停；画布聚焦后的键盘在独立可视本地预览验证。停止时重复销毁警告已作最小修复并复验；退出 IPC/WebContents 诊断保留。本次收尾不重跑 GUI，构建入口/微信方向仍待实际构建。
+5. 源码/静态记录见 [P1-02 开发报告](docs/reports/2026-10-27_issue-2_landscape-lobby.md)，前次暂缓历史见 [导入报告](docs/reports/2026-10-27_issue-2_windows-gui-import.md)，最新结果见 [GUI 验收报告](docs/reports/2026-10-27_issue-2_windows-gui-acceptance.md)。P1-01 [横屏图形报告](docs/reports/2026-10-26_issue-1_landscape-gui-acceptance.md) 和 [旧竖屏报告](docs/reports/2026-10-26_issue-1_windows-gui-acceptance.md) 仅证明当时 Startup，不证明新大厅。
+6. Agent 从 `AGENTS.md` 开始；Feature 及完整文档见下方导航。图形操作遵守当次许可及用户的暂停/恢复安排，不自动重启。
 
 ## 重要的系统保护规则
 
@@ -34,12 +35,12 @@
 
 | 项目 | 规划选择 | 当前状态 |
 | --- | --- | --- |
-| 游戏引擎 | Cocos Creator **3.8.8** | Windows Startup 横屏三种比例及停止/重启已验收；微信真机未验证 |
+| 游戏引擎 | Cocos Creator **3.8.8** | Startup 已验收；Lobby 三比例/交互/启停已实测，详见 GUI 报告及保留诊断 |
 | 语言 | TypeScript **5.8.2** | 与该编辑器内置编译器一致；启动脚本类型检查通过 |
 | 微信目标 | 微信小游戏，全项目首发横屏 | 后续构建设为 Landscape 并核验 game.json；本轮未构建/真机 |
-| 游戏架构 | 公共大厅 + 插件化小游戏 + 各自存档 | 仍为目标架构；当前只有独立启动测试 |
+| 游戏架构 | 公共大厅 + 插件化小游戏 + 各自存档 | 已有独立大厅视图/纯模型源码；游戏模块、选角和存档仍未实现 |
 | 联机 | 后期 Node.js + WSS 房间服务器 | 尚未开发 |
-| 版本管理 | [muddyrain/yier-bubu-gamehouse](https://github.com/muddyrain/yier-bubu-gamehouse) + Issue/审查 | 使用 master；P1-01 已验收，Git 写入须逐次明确授权，交付记录见 Issue #1 |
+| 版本管理 | [muddyrain/yier-bubu-gamehouse](https://github.com/muddyrain/yier-bubu-gamehouse) + Issue/审查 | P1-02 按本次明确授权完成安全收尾；后续功能和 Git 操作需各自授权 |
 
 ## 安装依赖与无界面验证
 
@@ -74,7 +75,7 @@ python3 -B tools/validate.py typecheck
 
 类型检查预检 `node_modules/typescript/lib/tsc.js`、编辑器真实生成的 `client/temp/tsconfig.cocos.json`，以及 `client/temp/declarations/` 中的 `cc.d.ts`、`cc.env.d.ts`、`cc.custom-macro.d.ts`、`jsb.d.ts`；缺任何一项均报告 `blocked`，不会启动引擎，也不使用伪造 `cc` 类型。这些声明引用的实际引擎文件也必须存在；安装路径失效等内容问题由 tsc 报 `failed`。**Mac 不得为补齐文件自行打开 Cocos**；本轮没有 Mac 实测。源码保持严格类型检查，`skipLibCheck` 仅跳过引擎 `.d.ts` 内部检查。
 
-`unit` 现包含工具行为和工程静态回归：meta 完整性/唯一性、场景对象及脚本引用、项目默认分辨率/适配策略、既有 Canvas/相机横屏参数、引擎版本、Git 忽略边界。纯 ZIP 无 `.git` 时仅跳过 Git 忽略规则测试，其余测试仍可执行，无需 Cocos 或 Node。审查包也不携带依赖和机器相关声明，直接执行 `typecheck` 的预期结果为 `blocked`。
+`unit` 保留原 13 项工具/工程回归（meta、场景/脚本引用、横屏 Canvas/相机、引擎版本、Git 忽略），新增 Lobby 资源引用与纯 TS 逻辑，共 15 项 unittest；其中 Node 逻辑含 9 组断言、10 秒预算。新逻辑测试需要现有 Node 和锁定 TypeScript，在内存运行无 cc 导入的模型，缺依赖时失败且不自动安装；不使用引擎桩。无 `.git` 时仅 Git 忽略测试 skip。新检出不带机器相关声明，直接 `typecheck` 应 `blocked`；不能在 Mac 自动打开 Cocos 补齐。
 
 原有只读命令 `python tools/check_docs.py`（Mac 用 `python3`）仍可使用；建议使用有超时和日志的 `validate.py docs`。源码、场景、`.meta`、共享 `settings` 和锁文件纳入版本控制；`client/settings/v2/packages/cocos-service.json`、`information.json` 属于本机服务/权益配置，由 `client/.gitignore` 精确忽略并保留原文件，不依赖全局 Git 配置。缓存、本机配置和日志均忽略。Git 操作仍需按 [WORKFLOW.md](docs/WORKFLOW.md) 单独授权。
 
@@ -88,4 +89,4 @@ python3 -B tools/validate.py typecheck
 
 ## 本轮交付边界
 
-**P1-01 / Issue #1** 已获用户最终复审接受；任务与阶段状态唯一见 [PLAN](docs/PLAN.md)。[横屏基线](docs/reports/2026-10-26_issue-1_landscape-baseline.md)、[Windows 三比例图形复验](docs/reports/2026-10-26_issue-1_landscape-gui-acceptance.md) 和 [F-01 修复](docs/reports/2026-10-26_issue-1_config-ignore-fix.md) 均有独立证据，旧竖屏报告与原审查包保留。按本次明确授权完成安全检查、提交/推送及 Issue 收尾，详见 [收尾报告](docs/reports/2026-10-26_issue-1_closeout.md)；本轮不重跑 GUI、不改玩法、不重建工程。Mac/微信真机与性能仍未验证，完成后停止，不开始 P1-02。
+**P1-02 / Issue #2** 完整外部源码复审已通过，用户同意该任务范围收尾入库；阶段/Feature 状态唯一见 PLAN / FEATURES。三比例、真实输入/重复进出、组件恢复及刷新后预览启停已有证据，原失败与退出诊断详见 GUI 报告。FEAT-001 AC-03 仍待 FEAT-003，Mac、微信真机、安全区、触控、性能及组件独立移除未验证。全部源码/Meta/配置、私有配置、原回归及历史证据保留；本次只按授权收尾，不重启 GUI、不开始 P1-03。
