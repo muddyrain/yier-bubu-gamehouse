@@ -1,6 +1,6 @@
 # 文档导航与单一职责
 
-> DOC-INDEX · v1.12 · 2026-10-28 · 状态：维护中。**禁止新增多个文件维护同一事实**。
+> DOC-INDEX · v1.22 · 2026-10-29 · 状态：维护中。**禁止新增多个文件维护同一事实**。
 
 | 文件 | 唯一职责 | 更新触发条件 |
 | --- | --- | --- |
@@ -39,8 +39,20 @@
 | [P1-02 Windows GUI 验收报告](reports/2026-10-27_issue-2_windows-gui-acceptance.md) | 恢复许可后的三比例、21 次交互、键盘/遮罩/组件恢复、销毁修复及启停/清理/CLI 证据 | Issue #2 剩余 GUI 验收与最终 Code Review |
 | [P1-02 最终复审准备报告](reports/2026-10-27_issue-2_final-review-preparation.md) | 完整源码 ZIP、含新增文件的 Git 差异、SHA-256、脱敏测试结果及覆盖缺口 | Issue #2 最终 Code Review 材料整理，不构成提交授权 |
 | [P1-02 收尾报告](reports/2026-10-28_issue-2_closeout.md) | 用户最终验收/本次 Git 授权、23 路径审查包一致性、安全检查与提交边界 | Issue #2 最终安全检查、获授权入库及远端确认后关闭 |
+| [P1-03 选角开发报告](reports/2026-10-28_issue-3_character-selection.md) | 本地双角色选择/确认模型、现有大厅接入、原成果保留、安全 CLI 和待许可 GUI 的独立证据 | Issue #3 开发交付与 Code Review，不构成真实游戏集成验收 |
+| [P1-03 GUI 证据报告](reports/2026-10-28_issue-3_windows-gui-acceptance.md) | 既有真实选角截图、底色缺陷与修复、16:9 输入/重复往返及三比例/清理缺口 | Issue #3 GUI 后续证据整理，不宣称完整矩阵通过 |
+| [P1-03 最终复审准备报告](reports/2026-10-28_issue-3_final-review-preparation.md) | 完整源码与 GUI 证据 ZIP、diff/清单/SHA-256、安全 CLI 和导出副本验证 | Issue #3 最终 Code Review 准备，无 GUI/Git 写入 |
+| [P1-03 Windows GUI 补验与暂停报告](reports/2026-10-28_issue-3_windows-gui-followup.md) | 前半段三比例/重复往返/组件、旧进程退出与新一轮输入保护暂停 | 保留暂停时的 not_run 和原始失败；最新结果另见完成报告 |
+| [P1-03 Windows GUI 完成报告](reports/2026-10-28_issue-3_windows-gui-completion.md) | 当时的按键/编辑器启停与退出记录，原文保留；40—54 重复截图已在 F-02 撤回其证明力 | 保留历史，键盘当前结论见下一项 |
+| [P1-03 F-02 键盘证据报告](reports/2026-10-29_issue-3_f02-keyboard-evidence.md) | 重复归档根因、真实尺寸/字节及像素校验修复、历史保留与本次许可后的补证结果 | 仅修复证据流程，不重新开发选角 |
+| [P1-03 F-02 恢复准备报告](reports/2026-10-29_issue-3_f02-resumption.md) | 本轮许可状态、待补键盘矩阵、安全检查和功能原型先行决策同步 | 只补证与规划，未授权时保持 GUI not_run |
+| [P1-03 F-02 键盘验收报告](reports/2026-10-29_issue-3_f02-keyboard-acceptance.md) | 新许可后的真实键盘画面、文件/像素哈希、原日志与正常退出证据 | 只补 F-02，旧重复图和准备报告保留，停止 Code Review |
+| [P1-03 正式收尾报告](reports/2026-10-29_issue-3_closeout.md) | 29 路径审查一致性、索引精确暂存、独立研究保留、最终安全检查及本次 Git 授权边界 | Issue #3 收尾，不扩展为完整 Feature 或下一任务 |
 
 ## 阅读流程
+
+本轮提交边界与补充工具审查材料见 [P1-03 提交前范围核查报告](reports/2026-10-29_issue-3_precommit-scope.md)，仅记录交付范围与验证证据，不代替 PLAN 或 FEATURES。
+
 
 - 新任务：`AGENTS.md` → `docs/PLAN.md` → `docs/FEATURES.md` → 对应 Feature → 相关细则。
 - 补功能：**先**在相关 Feature 中写用户场景、范围和验收，再改实现。

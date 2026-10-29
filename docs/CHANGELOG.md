@@ -1,9 +1,18 @@
 # 文档与产品决策变更记录
 
-> DOC-CHANGELOG · v1.12 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
+> DOC-CHANGELOG · v1.22 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
 
 | 日期 | 类型 | 影响文件 | 原因与变化 | 验证/待验证 |
 | --- | --- | --- | --- | --- |
+| 2026-10-29 | P1-03-closeout | README、PLAN、FEATURES、FEAT-002、TESTING、INDEX、CHANGELOG、收尾报告及已审 29 路径 | 用户接受源码/F-02/工具与范围复审，明确授权索引精确暂存、提交及普通推送，远端确认后关闭 Issue #3；P1-03 done，P1/FEAT-001/002 保持 in_progress | 安全 CLI、暂存哈希/差异及独立研究原文保留见报告；不重跑 GUI，不提交研究/.url/缓存/私有配置，不开始 FEAT-003 |
+| 2026-10-29 | P1-03-precommit-scope | PLAN、INDEX、本轮范围报告及本机拟提交副本/补充审查包 | 用户确认 F-02 人工验收后，仅无 GUI 核对提交范围；分离选角、素材调研及后续规划，保留全部原文；三份证据工具首次提供完整源码审查 | 无暂存或提交；实际安全 CLI、精确拆分/包校验见报告；工具待复审，P1/P1-03 与 FEAT-002 不提前 done |
+| 2026-10-29 | P1-03-F02-keyboard-acceptance | README、PLAN、FEATURES、FEAT-001/002、ARCHITECTURE、TESTING、INDEX、键盘验收报告与本机证据包 | 用户本次明确许可后补关键键盘状态，19 张真实 JPEG 的画面/真实尺寸/文件及像素哈希分别核对，旧 invalid_capture 不覆盖；选角源码无修改 | 键盘、确认布布、取消草稿与介绍开关有新证据；正常退出后进程/项目窗口/7456=0；原始日志与工具失败保留，最终安全 CLI 见报告；P1-03 in_progress，停止 Code Review，无 Git 写入/下一功能 |
+| 2026-10-29 | P1-03-F02-evidence | 采集/图像审计工具与 4 项回归、README、PLAN、FEAT-001/002、ARCHITECTURE、TESTING、INDEX、补充报告 | 旧保存函数闭包读到首图，40—54 重复；JPEG 被误按 PNG 读取尺寸。改为显式字节参数、独占保存、真实解码尺寸及文件/像素哈希核对，原始证据全部保留 | 无 GUI 复现 failed、修复回归 passed；本次键盘补证待新许可 not_run，P1-03/FEAT-002 保持 in_progress，AC-02 留待 FEAT-003，无产品源码/场景/Meta 或 Git 写入 |
+| 2026-10-28 | P1-03-gui-completion | README、PLAN、FEAT-001/002、ARCHITECTURE、ART_ASSETS、TESTING、INDEX、完成报告与本机最终证据包 | 用户恢复许可后补齐全按键、第 2 次编辑器停止与正常退出，保留 55 图及全部原失败/暂停记录；无源码/场景/Meta/测试改动 | 两次编辑器启停与全矩阵有证据；Cocos/项目窗口/7456 监听=0，2 IPC/1 WebContents 警告保留，CLI 16 项/tsc/文档/编码/Git 核对见报告；P1-03 等待最终验收、FEAT-002 AC-02 待 FEAT-003，无 Git 写入 |
+| 2026-10-28 | P1-03-gui-followup-paused | PLAN、README、FEAT-001/002、ARCHITECTURE、ART_ASSETS、TESTING、INDEX、本次补验报告 | 明确许可后用真实编辑器补三比例、双方各三次、七入口、遮罩/取消及组件恢复；旧 17 进程正常退出，源码/场景/Meta/测试原字节保留 | 第 1 次启停及第 2 次启动通过；内嵌焦点失败/停止时 2 IPC 警告保留，输入与遮挡保护后暂停，键盘复验/第 2 次停止/新进程清理 not_run；安全 CLI 通过，无 Git 写入，P1-03 仍 in_progress |
+| 2026-10-28 | P1-03-final-review-preparation | PLAN、README、FEAT-001/002、ARCHITECTURE、ART_ASSETS、TESTING、INDEX、复审准备及 GUI 证据报告；本机源码审查 ZIP | 保留已开发源码/占位/原测试和全部历史；白名单完整源码与真实原图打包，附含新增文件的 diff、清单、SHA-256、脱敏实际结果及未验证项 | 安全 CLI/导出核验见报告；本轮无 GUI/Git 写入，P1-03/FEAT-002 仍 in_progress，停止最终 Code Review |
+| 2026-10-28 | P1-03-gui-evidence | LobbyView、client/package.json、GUI 证据报告及关联文档 | 汇总前次明确许可下的真实 16:9 选角/确认/键盘/取消/三次往返/遮罩；白熊同色缺陷仅改双方卡片底色并重新导入验证；编辑器补 package version 3.8.8，UUID 不变 | 19 张原图含失败，浏览器日志无阻断错误；停止 IPC 警告和两次 Escape 中断保留，4:3/21:9、组件恢复、完整启停/清理等 not_run；没有用历史图补验收 |
+| 2026-10-28 | P1-03-character-selection | LobbyModel/LobbyView、两份新测试、FEAT-001/002/003、FEATURES、PLAN、ARCHITECTURE、ART_ASSETS、ASSET_LICENSES、TESTING、README、INDEX、开发报告 | 现有大厅新增独立本地选角入口，复用单遮罩和原创双熊；初始中立、选择/确认/返回/再选/非法 ID 保护，只读局部结果留待 FEAT-003；保留场景/Meta/原 15 回归，无游戏会话/存档/联网 | 安全 CLI 16 项（原 9 组 Lobby + 新 13 组断言）、tsc/文档/编码/Git 保留检查见报告；首次 tsc 失败已保留并修正；GUI/Mac/微信仍 not_run，P1-03/FEAT-002 in_progress，停止 Code Review，无 Git 写入 |
 | 2026-10-28 | P1-02-closeout | README、PLAN、FEAT-001、ARCHITECTURE、TESTING、INDEX、收尾报告及全部已审查 P1-02 项目文件 | 用户完整外部复审通过并接受任务范围，本次授权最终安全检查、逐文件暂存、提交/推送 origin/master，确认远端后关闭 Issue #2；P1-02 done，P1/FEAT-001 继续 in_progress，AC-03 待 FEAT-003 | 已审查 ZIP 的 79 文件/23 变更逐字节吻合，无额外改动；15 回归/tsc/文档/编码/暂存/私有忽略核对见报告，本轮 GUI not_run，历史诊断保留，不开始 P1-03 |
 | 2026-10-27 | P1-02-final-review-preparation | PLAN、INDEX、本次复审准备报告；本机生成完整源码 ZIP/清单/diff/SHA-256 | 保留现有全部成果，包含 GUI 期间的节点销毁修复、原测试及真实生命周期回归用例/证据摘要；完整差异覆盖未跟踪新增文件，按白名单排除私人配置/缓存/依赖/原始本机证据 | 安全 CLI 与导出副本检查见报告；导出 typecheck 缺真实生成声明/依赖为 blocked，GUI 本轮 not_run；P1-02 继续 in_progress，无 Git 写入 |
 | 2026-10-27 | P1-02-gui-acceptance | LobbyView.ts、README、PLAN、FEAT-001、ARCHITECTURE、TECH_STACK、TESTING、INDEX、GUI 验收报告 | 用户明确恢复前台操作；完成三比例、七入口各三次、键盘/鼠标/遮罩/组件恢复；真实停止警告增加 isValid 严格有效性检查，保留 Scene/Meta/P1-01 | 脚本刷新后两次启停与 CLI passed；前两次销毁警告、嵌入焦点失败、退出 IPC/WebContents/计时诊断及前次 not_run 均保留；进程已退出，待最终复审，无 Git 写入/新功能 |

@@ -1,13 +1,14 @@
 # Feature 总表、编号与实施状态（唯一 Feature 状态源）
 
-> DOC-FEATURES · v1.3 · 2026-10-27。状态按功能全部验收范围填写；P1-02 已获授权开发大厅，未通过完整图形/集成验收前不标 done。单项详见 `docs/features/`。
+> DOC-FEATURES · v1.7 · 2026-10-29。P1-03 专项已获完整复审并按本次授权收尾；Feature 状态仍按全部验收范围填写，FEAT-002 AC-02 待真实游戏集成。单项详见 `docs/features/`。
 
-全项目首发界面统一横屏，以 1280×720 为设计基准，暂不做单游戏动态旋转，见 [ADR-0003](decisions/ADR-0003-landscape-first.md)。P1-02 仅推进 FEAT-001 大厅，未提前完成选角、生命周期、联机或发布质量功能。
+全项目首发界面统一横屏，以 1280×720 为设计基准，暂不做单游戏动态旋转，见 [ADR-0003](decisions/ADR-0003-landscape-first.md)。P1-03 仅实现大厅内本地选角；FEAT-002 AC-02 真实游戏集成仍待 FEAT-003，不提前完成生命周期、联机或发布质量功能。
+
 
 | ID | 功能与详情 | 优先级 | 阶段 | 状态 | 依赖 |
 | --- | --- | --- | --- | --- | --- |
 | FEAT-001 | [游戏大厅与目录](features/FEAT-001-game-lobby.md) | P0 | P1 | `in_progress` | 无 |
-| FEAT-002 | [一二/布布选角](features/FEAT-002-character-selection.md) | P0 | P1 | `planned` | 001 |
+| FEAT-002 | [一二/布布选角](features/FEAT-002-character-selection.md) | P0 | P1 | `in_progress` | 001 |
 | FEAT-003 | [小游戏生命周期和注册](features/FEAT-003-game-module-lifecycle.md) | P0 | P1 | `planned` | 001 |
 | FEAT-004 | [玩家进度和存档](features/FEAT-004-save-system.md) | P0 | P1 | `planned` | 002、003 |
 | FEAT-005 | [一二布布守护小屋](features/FEAT-005-tower-defense.md) | P0 | P2/P4 | `planned` | 002–004 |

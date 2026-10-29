@@ -1,6 +1,6 @@
 # FEAT-003 — 小游戏注册与生命周期
 
-> FEAT-003 · v1.0 · 2026-10-26 · 所属阶段：P1 · 负责人：待定。**实施状态以 `docs/FEATURES.md` 为准，当前为计划方案。**
+> FEAT-003 · v1.1 · 2026-10-28 · 所属阶段：P1 · 负责人：待定。**实施状态以 `docs/FEATURES.md` 为准，当前为计划方案。** P1-03 仅提供未来可读的本地选角结果，不实现本 Feature。
 
 ## 1. 目标与用户故事
 
@@ -30,6 +30,8 @@
 - GameId、GameMode、GameSession
 - GameModule 生命周期
 - GameModule 自己拥有局内状态
+- 接入前置：P1-03 的 `LobbyView.getConfirmedCharacter(): CharacterChoice | null`，结果只含稳定 `characterId`，尚未选/确认则 null。未来加载方读取后构造自身会话，不将该偏好视为已有 GameSession 或存档。
+- FEAT-002 AC-02 须在本 Feature 有真实可用原型后，分别以一二/布布进入同一场景验收；本轮不提前勾选。
 
 ## 5. 验收标准
 

@@ -1,6 +1,6 @@
 # 目标系统架构与依赖边界
 
-> DOC-ARCH · v1.9 · 2026-10-28 · 目标模块仍为计划；P1-02 已通过最终复审并获专项验收，真实游戏生命周期及 FEAT-001 AC-03 仍待集成。
+> DOC-ARCH · v1.16 · 2026-10-29 · P1-03 本地选角与 F-02 真实键盘证据；真实游戏生命周期仍为计划，未实现。
 
 ## 1. 分层与模块图（目标）
 
@@ -59,7 +59,24 @@ package.json / package-lock.json     # 外部 TypeScript 检查器；不是引�
 - 设计容器按 Canvas 尺寸整体等比缩放，保留双主角区域和 2×2 目录相对关系，接受留边；手机系统安全区适配未实现/验证。
 - 后续 FEAT-002/003 应从稳定 GameId/CharacterId 和明确的导航动作接入。本轮不写入 selectedCharacter、不加载子游戏、不读写存档或联网；好友只显示未开放说明。
 
-原 13 项测试不改，新增资源引用检查及直接执行真实纯 TS 模型的逻辑回归；纯逻辑返回 HOME 不代表真实场景往返、UI 无泄漏或真实触控已验收。入口与证据见 [P1-02 报告](reports/2026-10-27_issue-2_landscape-lobby.md)。下面仍是后续目标，未新增空目录：
+原 13 项测试不改，新增资源引用检查及直接执行真实纯 TS 模型的逻辑回归；纯逻辑返回 HOME 不代表真实场景往返、UI 无泄漏或真实触控已验收。入口与证据见 [P1-02 报告](reports/2026-10-27_issue-2_landscape-lobby.md)。
+
+### P1-03 本地选角实现
+
+证据更正：2026-10-29 F-02 发现上一轮独立预览 40—54 键盘图片重复，旧键盘验收声明须补证，见 [F-02 报告](reports/2026-10-29_issue-3_f02-keyboard-evidence.md)。只修复采集/索引，本文描述的产品结构、源码和 Meta 不变；三比例/重复往返/组件/编辑器启停证据仍获外部复审接受。
+
+随后本次明确许可的 [F-02 键盘补验](reports/2026-10-29_issue-3_f02-keyboard-acceptance.md) 取得 19 张独立真实预览图，分别验证焦点/选中/确认/取消及原介绍开关；只验证键盘，不替代或重做编辑器生命周期，源码/Meta 保持原字节。
+
+在现有 LobbyModel/LobbyView 内扩展，没有新增场景、脚本资产、Meta、全局管理器或存档模块。P1-02 章节描述原验收时的行为；现在大厅有独立选角入口，原七入口仍可用，四款仍为 coming-soon。
+
+- `CharacterId = 'yier' | 'bubu'` 与只读 CharacterEntry 复用唯一 CHARACTERS 目录；`isCharacterId(unknown)` 接受精确 ID。`CharacterChoice` 只含只读 characterId，确认时冻结，不允许调用方改写返回对象。
+- 纯 `transitionLobby(LobbyState, AppAction)` 维护单一顶层 screen（home / notice / characters）和 choice。选角 screen 有 choosing/confirmed 阶段、draft 和可恢复 error；空草稿不能确认，未知 ID 不替换合法草稿/结果，确认阶段先「再次选择」才可修改。
+- 返回和组件禁用都回 HOME，取消未确认草稿，保留上次 choice；重进以 choice 为草稿，重新创建 LobbyView 则从 null 开始。状态由实例持有，不使用本地存储、静态可变单例、网络或 GameSession。
+- `LobbyView.getConfirmedCharacter(): CharacterChoice | null` 是未来 FEAT-003 的读取边界，没有消费者/游戏加载实现；真实游戏集成仍为 not_run。
+- 一个遮罩下的提示/选角内容互斥，节点只在 onLoad 构造；onEnable/onDisable 继续配对订阅同一函数，关闭/渲染不增订阅。键盘和鼠标均只激活当前面板的可用控件，确认门槛影响按钮和焦点序列；初始面板焦点为返回。原严格销毁有效性检查保留。
+- 同一几何绘制方法用于大厅和选角，角色容器均 136×136 设计单位；选角卡片对称，同字号/尺寸，颜色/名称来自目录。整体沿用 ADR-0003 的等比完整显示与留边策略。
+
+原 15 项测试保持原字节，新增 13 组模型/视图 AST 契约断言，由一个 10 秒 CLI 子进程执行。静态订阅检查不证明引擎时序/无泄漏。本次真实编辑器完成三比例、各角色三次、七入口、遮罩/取消、组件恢复及两次启停；恢复保留确认/取消草稿，重启中立，正常退出无残留。独立可视预览只补键盘，未替代编辑器生命周期。最新见 [GUI 完成报告](reports/2026-10-28_issue-3_windows-gui-completion.md)，原 [GUI 失败及修复](reports/2026-10-28_issue-3_windows-gui-acceptance.md)、[补验暂停](reports/2026-10-28_issue-3_windows-gui-followup.md) 保留；本轮无源码修改。原开发见 [P1-03 报告](reports/2026-10-28_issue-3_character-selection.md)。下面目录仍为未来目标。
 
 ```text
 client/                  # Cocos Creator 项目
@@ -93,7 +110,7 @@ scripts/                 # 检查/构建脚本，经安全审查才执行
 | --- | --- | --- |
 | 大厅导航、活动选择 | App Shell | 应用启动 / 退出 |
 | 单次关卡、计时、碰撞对象 | 对应 GameModule | 进入游戏 / 退出释放 |
-| 已选择的本地角色 | PlayerProfile 或临时局状态 | 会话期间 / 根据设计保存 |
+| 当前大厅已确认角色 | 当前 LobbyView 实例 | 首次确认 / 实例销毁；禁用恢复保留，重载清空；未来持久化另行设计 |
 | 各游戏长线进度 | 各游戏定义，由 SaveRepository 持久化 | 关卡结算或安全检查点 |
 | 饼干币与全局收藏 | Shared Progression | 成功结算后原子更新 |
 | 在线房间角色/准备/分数 | P5 Room Server | 建房 / 关闭房间 |

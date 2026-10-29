@@ -3,10 +3,10 @@ import {
     input, Input, isValid, KeyCode, Label, Node, UITransform,
 } from 'cc';
 import {
-    CHARACTERS, DESIGN, GAMES, HOME, LAYOUT, STATUS_TEXT,
-    fitDesign, moveFocus, navigate,
+    CHARACTERS, DESIGN, GAMES, INITIAL_LOBBY, LAYOUT, SELECTION_LAYOUT, STATUS_TEXT,
+    characterStatus, fitDesign, moveFocus, transitionLobby,
 } from './LobbyModel';
-import type { Box, LobbyAction, Navigation } from './LobbyModel';
+import type { AppAction, Box, CharacterChoice, CharacterEntry, LobbyState } from './LobbyModel';
 
 const { ccclass } = _decorator;
 const INK = '#40382F';
@@ -18,24 +18,40 @@ interface Control {
     readonly node: Node;
     readonly graphics: Graphics;
     readonly button: Button;
-    readonly action: LobbyAction;
+    readonly action: AppAction;
     readonly fill: string;
     readonly box: Box;
     readonly click: () => void;
 }
 
-/** P1-02 view only. The unchanged Startup scene remains the P1-01 runtime probe. */
+/** Lobby UI and local preference owner. Startup remains the unchanged P1-01 runtime probe. */
 @ccclass('LobbyView')
 export class LobbyView extends Component {
     private root!: Node;
     private overlay!: Node;
     private modalTitle!: Label;
     private modalBody!: Label;
+    private noticePanel!: Node;
+    private characterPanel!: Node;
+    private characterMessage!: Label;
+    private characterEntry!: Control;
+    private characterEntryLabel!: Label;
+    private readonly characterCards: Control[] = [];
+    private readonly selectedLabels: Label[] = [];
+    private characterBack!: Control;
+    private confirmCharacter!: Control;
+    private reselect!: Control;
     private readonly controls: Control[] = [];
     private readonly homeControls: Control[] = [];
     private back!: Control;
-    private state: Navigation = HOME;
+    private state: LobbyState = INITIAL_LOBBY;
     private focusIndex = 0;
+    private panelFocusIndex = 0;
+
+    /** Immutable preference for a future FEAT-003 caller, never a game session or saved profile. */
+    public getConfirmedCharacter(): CharacterChoice | null {
+        return this.state.choice;
+    }
 
     protected onLoad(): void {
         this.root = this.nodeBox(this.node, 'LobbyRoot', { x: 0, y: 0, ...DESIGN });
@@ -63,9 +79,12 @@ export class LobbyView extends Component {
             this.homeControls.push(item);
             this.label(item.node, type === 'help' ? '帮助' : '设置', 0, 0, 92, 38, 20, INK);
         }
+        // Keep the original seven controls' keyboard order; append the new entry.
+        this.homeControls.push(this.characterEntry);
         this.label(this.root, '全部游戏开发中 · 暂无可继续的存档', 0, -284, 1100, 30, 19, MUTED);
         this.label(this.root, '原创几何占位 · 正式角色美术与玩法尚未开放', 0, -319, 1100, 26, 16, MUTED);
         this.createNotice();
+        this.createCharacterSelection();
     }
 
     protected onEnable(): void {
@@ -82,7 +101,8 @@ export class LobbyView extends Component {
         for (const control of this.controls) control.node.off(Button.EventType.CLICK, control.click, this);
         this.node.off(Node.EventType.SIZE_CHANGED, this.fit, this);
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
-        this.state = HOME;
+        this.state = transitionLobby(this.state, { type: 'close' });
+        this.panelFocusIndex = 0;
         this.root.active = false;
     }
 
@@ -105,26 +125,31 @@ export class LobbyView extends Component {
         this.label(hero, '一二 & 布布', 0, 175, 320, 38, 26, INK);
         this.label(hero, '两位主角，同样重要', 0, 140, 320, 26, 18, MUTED);
         CHARACTERS.forEach((character, index) => {
-            const face = this.nodeBox(hero, character.id, LAYOUT.avatars[index]);
-            const pen = face.addComponent(Graphics);
-            pen.fillColor = Color.fromHEX(new Color(), character.color);
-            pen.circle(-31, 47, 17);
-            pen.circle(31, 47, 17);
-            pen.ellipse(0, -28, 39, 30);
-            pen.circle(0, 14, 41);
-            pen.fill();
-            pen.fillColor = Color.fromHEX(new Color(), INK);
-            pen.circle(-13, 20, 3);
-            pen.circle(13, 20, 3);
-            pen.ellipse(0, 5, 5, 3);
-            pen.fill();
+            this.bear(hero, character, LAYOUT.avatars[index]);
             this.label(hero, character.name, LAYOUT.avatars[index].x, -38, 140, 36, 26, INK);
             this.label(hero, character.identity, LAYOUT.avatars[index].x, -73, 140, 26, 18, MUTED);
         });
-        const friends = this.control(hero, 'Friends', { x: 0, y: -126, width: 292, height: 56 }, { type: 'friends' }, '#D8E4D9');
+        this.characterEntry = this.control(hero, 'ChooseCharacter', { x: 0, y: -116, width: 292, height: 48 }, { type: 'characters' }, '#D8E4D9');
+        this.characterEntryLabel = this.label(this.characterEntry.node, '选择角色', 0, 0, 276, 38, 21, INK);
+        const friends = this.control(hero, 'Friends', { x: 0, y: -174, width: 292, height: 48 }, { type: 'friends' }, '#D8E4D9');
         this.homeControls.push(friends);
         this.label(friends.node, '好友一起玩 · 敬请期待', 0, 0, 276, 40, 20, INK);
-        this.label(hero, '现在先逛逛，更多故事正在准备', 0, -177, 320, 30, 17, MUTED);
+    }
+
+    private bear(parent: Node, character: CharacterEntry, box: Box): void {
+        const face = this.nodeBox(parent, character.id, box);
+        const pen = face.addComponent(Graphics);
+        pen.fillColor = Color.fromHEX(new Color(), character.color);
+        pen.circle(-31, 47, 17);
+        pen.circle(31, 47, 17);
+        pen.ellipse(0, -28, 39, 30);
+        pen.circle(0, 14, 41);
+        pen.fill();
+        pen.fillColor = Color.fromHEX(new Color(), INK);
+        pen.circle(-13, 20, 3);
+        pen.circle(13, 20, 3);
+        pen.ellipse(0, 5, 5, 3);
+        pen.fill();
     }
 
     private createNotice(): void {
@@ -136,6 +161,7 @@ export class LobbyView extends Component {
         shade.fill();
         const panelBox = { x: 0, y: 0, width: 720, height: 440 };
         const panel = this.nodeBox(this.overlay, 'NoticePanel', panelBox);
+        this.noticePanel = panel;
         this.paint(panel.addComponent(Graphics), panelBox, PAPER, false);
         this.modalTitle = this.label(panel, '', 0, 142, 656, 60, 28, INK);
         this.modalBody = this.label(panel, '', 0, 24, 640, 172, 22, MUTED);
@@ -143,21 +169,82 @@ export class LobbyView extends Component {
         this.label(this.back.node, '返回大厅', 0, 0, 208, 40, 22, INK);
     }
 
-    private dispatch(action: LobbyAction): void {
-        this.state = navigate(this.state, action);
+    private createCharacterSelection(): void {
+        const panel = this.nodeBox(this.overlay, 'CharacterPanel', SELECTION_LAYOUT.panel);
+        this.characterPanel = panel;
+        this.paint(panel.addComponent(Graphics), SELECTION_LAYOUT.panel, PAPER, false);
+        this.label(panel, '选择你的主角', 0, 264, 880, 48, 30, INK);
+        this.label(panel, '一二与布布，同样重要 · 仅设置本次大厅偏好', 0, 220, 880, 32, 20, MUTED);
+        CHARACTERS.forEach((character, index) => {
+            const card = this.control(panel, `Choose-${character.id}`, SELECTION_LAYOUT.cards[index],
+                { type: 'choose-character', characterId: character.id }, '#EEE4D4');
+            this.characterCards.push(card);
+            this.bear(card.node, character, { x: 0, y: 40, width: 136, height: 136 });
+            this.label(card.node, character.name, 0, -54, 320, 40, 28, INK);
+            this.label(card.node, character.identity, 0, -93, 320, 28, 20, MUTED);
+            this.selectedLabels.push(this.label(card.node, '', 0, -124, 320, 26, 18, ACCENT));
+        });
+        this.characterMessage = this.label(panel, '', 0, -156, 920, 64, 20, INK);
+        this.characterBack = this.control(panel, 'CancelCharacter', SELECTION_LAYOUT.buttons[0], { type: 'close' }, '#EDE5D9');
+        this.label(this.characterBack.node, '返回大厅', 0, 0, 184, 40, 22, INK);
+        this.confirmCharacter = this.control(panel, 'ConfirmCharacter', SELECTION_LAYOUT.buttons[1], { type: 'confirm-character' }, '#D8E4D9');
+        this.label(this.confirmCharacter.node, '确认选择', 0, 0, 184, 40, 22, INK);
+        this.reselect = this.control(panel, 'ReselectCharacter', SELECTION_LAYOUT.buttons[2], { type: 'reselect' }, '#D8E4D9');
+        this.label(this.reselect.node, '再次选择', 0, 0, 184, 40, 22, INK);
+    }
+
+    private dispatch(action: AppAction): void {
+        const previous = this.state.screen;
+        this.state = transitionLobby(this.state, action);
+        const next = this.state.screen;
+        if (previous.kind !== next.kind || (previous.kind === 'characters' && next.kind === 'characters' && previous.phase !== next.phase)) {
+            this.panelFocusIndex = 0;
+        }
         this.render();
     }
 
     private render(): void {
-        const open = this.state.kind === 'notice';
+        const screen = this.state.screen;
+        const open = screen.kind !== 'home';
         this.overlay.active = open;
+        this.noticePanel.active = screen.kind === 'notice';
+        this.characterPanel.active = screen.kind === 'characters';
         for (const control of this.homeControls) control.button.interactable = !open;
-        if (this.state.kind === 'notice') {
-            this.modalTitle.string = this.state.title;
-            this.modalBody.string = this.state.body;
+        this.back.button.interactable = screen.kind === 'notice';
+        const choosing = screen.kind === 'characters' && screen.phase === 'choosing';
+        this.characterBack.button.interactable = screen.kind === 'characters';
+        this.confirmCharacter.button.interactable = choosing && screen.draft !== null;
+        this.reselect.node.active = screen.kind === 'characters' && screen.phase === 'confirmed';
+        this.reselect.button.interactable = this.reselect.node.active;
+        this.characterCards.forEach((control, index) => {
+            control.button.interactable = choosing;
+            const selected = screen.kind === 'characters' && screen.draft === CHARACTERS[index].id;
+            this.selectedLabels[index].string = selected ? (choosing ? '已选' : '已确认') : choosing ? '点击选择' : '未选择';
+        });
+        if (screen.kind === 'notice') {
+            this.modalTitle.string = screen.title;
+            this.modalBody.string = screen.body;
+        } else if (screen.kind === 'characters') {
+            this.characterMessage.string = characterStatus(screen);
         }
-        this.homeControls.forEach((control, index) => this.paint(control.graphics, control.box, control.fill, !open && index === this.focusIndex));
-        this.paint(this.back.graphics, this.back.box, this.back.fill, open);
+        const character = CHARACTERS.find(entry => entry.id === this.state.choice?.characterId);
+        this.characterEntryLabel.string = character ? `角色：${character.name} · 更改` : '选择角色';
+        const active = this.activeControls();
+        if (this.panelFocusIndex >= active.length) this.panelFocusIndex = 0;
+        const focused = active[open ? this.panelFocusIndex : this.focusIndex];
+        for (const control of this.controls) {
+            const selected = screen.kind === 'characters' && control.action.type === 'choose-character' && control.action.characterId === screen.draft;
+            const fill = selected ? '#E2EEDD' : control.button.interactable ? control.fill : '#EEEAE3';
+            this.paint(control.graphics, control.box, fill, control === focused);
+        }
+    }
+
+    private activeControls(): Control[] {
+        if (this.state.screen.kind === 'home') return this.homeControls;
+        if (this.state.screen.kind === 'notice') return [this.back];
+        // Neutral initial focus on Back. Disabled/hidden controls cannot receive keyboard input.
+        return [this.characterBack, ...this.characterCards, this.confirmCharacter, this.reselect]
+            .filter(control => control.node.active && control.button.interactable);
     }
 
     private onKeyDown(event: EventKeyboard): void {
@@ -167,11 +254,14 @@ export class LobbyView extends Component {
         }
         const forward = [KeyCode.TAB, KeyCode.ARROW_RIGHT, KeyCode.ARROW_DOWN].indexOf(event.keyCode) >= 0;
         const backward = [KeyCode.ARROW_LEFT, KeyCode.ARROW_UP].indexOf(event.keyCode) >= 0;
-        if ((forward || backward) && this.state.kind === 'home') {
-            this.focusIndex = moveFocus(this.focusIndex, this.homeControls.length, backward ? -1 : 1);
+        const active = this.activeControls();
+        if (forward || backward) {
+            if (this.state.screen.kind === 'home') this.focusIndex = moveFocus(this.focusIndex, active.length, backward ? -1 : 1);
+            else this.panelFocusIndex = moveFocus(this.panelFocusIndex, active.length, backward ? -1 : 1);
             this.render();
         } else if (event.keyCode === KeyCode.ENTER || event.keyCode === KeyCode.SPACE) {
-            this.dispatch(this.state.kind === 'home' ? this.homeControls[this.focusIndex].action : { type: 'close' });
+            const control = active[this.state.screen.kind === 'home' ? this.focusIndex : this.panelFocusIndex];
+            if (control) this.dispatch(control.action);
         }
     }
 
@@ -197,14 +287,16 @@ export class LobbyView extends Component {
         return label;
     }
 
-    private control(parent: Node, name: string, box: Box, action: LobbyAction, fill: string): Control {
+    private control(parent: Node, name: string, box: Box, action: AppAction, fill: string): Control {
         const node = this.nodeBox(parent, name, box);
         const graphics = node.addComponent(Graphics);
         const button = node.addComponent(Button);
         button.transition = Button.Transition.NONE;
         const control: Control = { node, graphics, button, action, fill, box, click: () => {
-            const index = this.homeControls.indexOf(control);
-            if (index >= 0) this.focusIndex = index;
+            const index = this.activeControls().indexOf(control);
+            if (index < 0) return;
+            if (this.state.screen.kind === 'home') this.focusIndex = index;
+            else this.panelFocusIndex = index;
             this.dispatch(action);
         } };
         this.controls.push(control);

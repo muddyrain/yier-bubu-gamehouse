@@ -1,4 +1,12 @@
-/** Engine-free P1-02 catalog and navigation. No game sessions, storage, or networking. */
+/** Engine-free catalog, navigation and local character choice. No sessions, storage or networking. */
+export type CharacterId = 'yier' | 'bubu';
+export interface CharacterChoice { readonly characterId: CharacterId }
+export interface CharacterEntry {
+    readonly id: CharacterId;
+    readonly name: string;
+    readonly identity: string;
+    readonly color: string;
+}
 export type GameId = 'tower-defense' | 'gold-miner' | 'merge' | 'snake';
 export interface GameCatalogEntry {
     readonly id: GameId;
@@ -16,7 +24,7 @@ export const GAMES: readonly GameCatalogEntry[] = Object.freeze([
     Object.freeze({ id: 'snake', name: '一二布布贪吃蛇', summary: '灵巧转向，挑战更长记录', category: '经典 · 灵巧挑战', color: '#4D7294', status: 'coming-soon' }),
 ]);
 
-export const CHARACTERS = Object.freeze([
+export const CHARACTERS: readonly CharacterEntry[] = Object.freeze([
     Object.freeze({ id: 'yier', name: '一二', identity: '小白熊', color: '#FFF9EF' }),
     Object.freeze({ id: 'bubu', name: '布布', identity: '小棕熊', color: '#B67B55' }),
 ]);
@@ -34,6 +42,12 @@ export const LAYOUT = Object.freeze({
         x: 32 + (i % 2) * 368, y: 80 - Math.floor(i / 2) * 208, width: 344, height: 180,
     }))),
     toolbar: Object.freeze([410, 528].map(x => Object.freeze({ x, y: 282, width: 104, height: 48 }))),
+});
+
+export const SELECTION_LAYOUT = Object.freeze({
+    panel: Object.freeze({ x: 0, y: 0, width: 1000, height: 624 }),
+    cards: Object.freeze([-214, 214].map(x => Object.freeze({ x, y: 38, width: 360, height: 292 }))),
+    buttons: Object.freeze([-230, 0, 230].map(x => Object.freeze({ x, y: -238, width: 200, height: 56 }))),
 });
 
 export function fitDesign(width: number, height: number): { scale: number; paddingX: number; paddingY: number } {
@@ -56,7 +70,7 @@ export function navigate(state: Navigation, action: LobbyAction): Navigation {
         case 'game': {
             const game = GAMES.find(entry => entry.id === action.gameId);
             return game
-                ? { kind: 'notice', title: game.name, body: `${game.summary}\n\n开发中 · 尚未开放\n当前只能查看介绍，暂不提供游戏或选角。` }
+                ? { kind: 'notice', title: game.name, body: `${game.summary}\n\n开发中 · 尚未开放\n当前只能查看介绍；本地选角请从大厅进入。` }
                 : { kind: 'notice', title: '内容暂不可用', body: '该游戏入口不存在。\n请返回大厅查看当前目录。' };
         }
         case 'friends':
@@ -64,8 +78,61 @@ export function navigate(state: Navigation, action: LobbyAction): Navigation {
         case 'settings':
             return { kind: 'notice', title: '设置说明', body: '当前使用原创程序几何占位。\n本版本没有音乐、音效，暂无可调整项。\n正式设置随相应功能一起开放。' };
         case 'help':
-            return { kind: 'notice', title: '欢迎来到游戏屋', body: '一二是小白熊，布布是小棕熊。\n点击任意游戏卡查看介绍，四款均在开发中。\n关闭提示即可回到大厅。\n键盘：Tab / 方向键切换，Enter 确认，Esc 返回。' };
+            return { kind: 'notice', title: '欢迎来到游戏屋', body: '一二是小白熊，布布是小棕熊。\n大厅可本地选角，四款游戏仍在开发中。\n点击游戏卡查看介绍，关闭提示返回大厅。\n键盘：Tab / 方向键切换，Enter 确认，Esc 返回。' };
     }
+}
+
+export interface CharacterScreen {
+    readonly kind: 'characters';
+    readonly phase: 'choosing' | 'confirmed';
+    readonly draft: CharacterId | null;
+    readonly error: string | null;
+}
+export interface LobbyState {
+    readonly screen: Navigation | CharacterScreen;
+    readonly choice: CharacterChoice | null;
+}
+export type AppAction = LobbyAction | { readonly type: 'characters' } | { readonly type: 'confirm-character' } | { readonly type: 'reselect' }
+    | { readonly type: 'choose-character'; readonly characterId: unknown };
+export const INITIAL_LOBBY: LobbyState = Object.freeze({ screen: HOME, choice: null });
+
+export function isCharacterId(value: unknown): value is CharacterId {
+    return CHARACTERS.some(character => character.id === value);
+}
+
+/** All actions go through the top screen; closing cancels only the unconfirmed draft. */
+export function transitionLobby(state: LobbyState, action: AppAction): LobbyState {
+    if (action.type === 'close') return { screen: HOME, choice: state.choice };
+    if (action.type === 'characters') {
+        return state.screen.kind === 'home'
+            ? { ...state, screen: { kind: 'characters', phase: 'choosing', draft: state.choice?.characterId ?? null, error: null } }
+            : state;
+    }
+    if (action.type === 'choose-character' || action.type === 'confirm-character' || action.type === 'reselect') {
+        const screen = state.screen;
+        if (screen.kind !== 'characters') return state;
+        if (action.type === 'reselect') {
+            return screen.phase === 'confirmed' ? { ...state, screen: { ...screen, phase: 'choosing', error: null } } : state;
+        }
+        if (screen.phase !== 'choosing') return state;
+        if (action.type === 'choose-character') {
+            return { ...state, screen: isCharacterId(action.characterId)
+                ? { ...screen, draft: action.characterId, error: null }
+                : { ...screen, error: '角色不可用，请选择一二或布布。' } };
+        }
+        if (!isCharacterId(screen.draft)) return state;
+        return { screen: { ...screen, phase: 'confirmed', error: null }, choice: Object.freeze({ characterId: screen.draft }) };
+    }
+    return state.screen.kind === 'characters' ? state : { ...state, screen: navigate(state.screen, action) };
+}
+
+export function characterStatus(screen: CharacterScreen): string {
+    if (screen.error) return screen.error;
+    const character = CHARACTERS.find(entry => entry.id === screen.draft);
+    if (!character) return '尚未选择角色 · 请选择一二或布布';
+    return screen.phase === 'confirmed'
+        ? `已选择${character.name}，游戏仍在开发中。\n仅本次大厅有效，未开始游戏或保存。`
+        : `已选：${character.name}（${character.identity}）· 请确认选择`;
 }
 
 export function moveFocus(current: number, count: number, direction: number): number {
