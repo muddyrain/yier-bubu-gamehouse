@@ -1,6 +1,6 @@
 # FEAT-002 — 一二与布布选角
 
-> FEAT-002 · v1.10 · 2026-10-29 · 所属阶段：P1 · 负责人：待定。**实施状态只在 `docs/FEATURES.md` 维护。** P1-03 专项及 F-02 已获最终复审，按本次授权收尾；真实游戏集成 AC-02 留待 FEAT-003。
+> FEAT-002 · v1.12 · 2026-10-30 · 所属阶段：P1 · 负责人：待定。**实施状态只在 `docs/FEATURES.md` 维护。** P1-03 专项及 F-02 已获最终复审，按本次授权收尾；P1-04 已补齐双方进入同一可用原型 AC-02。
 
 ## 1. 目标与用户故事
 
@@ -9,6 +9,7 @@
 ## 2. 玩法 / 交互与状态
 
 - 一二是小白熊（ID `yier`），布布是小棕熊（ID `bubu`），两个角色界面权重、可用性完全对等。
+- 正式头像/立绘以黄小B确认的真实原作和授权原件为标准，不使用自行设计相似熊或 AI 近似角色。当前几何图仍仅为开发占位；正式资源要求见 [素材规范](../ART_ASSETS.md) 和唯一权属台账。
 - 选角沿用 [ADR-0003](../decisions/ADR-0003-landscape-first.md) 的 1280×720 横屏基准，对称展示双方信息；单人和未来房间不另行旋转屏幕。
 - 单人默认先选择角色；主题名称《黄金矿工》等不限制选一二或布布。
 - 在游戏外可更改下一局的角色；局内是否允许更换由对应游戏规定。
@@ -33,15 +34,18 @@
 ## 4. 数据与依赖
 
 - CharacterId = yier | bubu，稳定 ID，不与本地化显示文字混用
-- P1-03：复用 LobbyModel 唯一 CHARACTERS 目录，`CharacterId = 'yier' | 'bubu'`；`CharacterChoice` 仅含只读 `characterId`。LobbyView 的 `getConfirmedCharacter()` 返回已确认结果或 null，FEAT-003 后续接入，不创建 GameSession。
+- P1-03：复用 LobbyModel 唯一 CHARACTERS 目录，`CharacterId = 'yier' | 'bubu'`；`CharacterChoice` 仅含只读 `characterId`。LobbyView 的 `getConfirmedCharacter()` 返回已确认结果或 null，P1-04 加载方读取副本创建 GameSession，选角本身不创建会话。
 - 角色 ID 校验接收 unknown，仅接受精确稳定 ID；非法输入保留合法的草稿/确认结果，显示可恢复错误，不能静默选择布布。
-- 未来 GameSession.selectedCharacter（计划，非本轮实现）
+- 后续 FEAT-003 优先验证双方进入同一真实测试场景并返回。角色视觉解析接口与身份/确认解耦是后续接入要求，不把当前 bear() 集中绘制宣称为已完成资源接口；这是 P1-03 的后续规划记录；P1-04 复用选角，先实现最小视觉创建边界。
+- P1-04 GameSession.characterId 为单局复制值；PlayerProfile/存档仍未实现
 - 房间中由服务端确认 selectedCharacter，详见 FEAT-011
+
+P1-04 实际从 getConfirmedCharacter() 复制 ID 到冻结 GameSession.characterId，双方进入同一个开发模块；未确认不能启动。大厅/选角/模块共用角色视觉创建接口，选择模型不重写。2026-10-30 真实 GUI 已验证双角色进入/操作/暂停/返回、三比例及双方各三次，支持 AC-02，见 [演示报告](../reports/2026-10-30_issue-4_visible-demo.md)。
 
 ## 5. 验收标准
 
 - [x] **AC-01**：两只熊身份、颜色和名称正确且在 UI 中平等展示。
-- [ ] **AC-02**：一二和布布任意一只都能从选角进入同一可用游戏原型。
+- [x] **AC-02**：一二和布布任意一只都能从选角进入同一可用游戏原型。
 - [x] **AC-03**：非法 CharacterId 被安全拒绝/回退，不造成崩溃。
 - [x] **AC-04**：重新进入选角时状态符合设计，不误把布布自动设置为唯一角色。
 - [x] **AC-05**：P1-03 的未选确认门槛、双角色确认/再选、返回丢弃草稿、原七入口、三次重复进出、键盘/遮罩及组件恢复在真实 Windows 引擎验收；16:9/4:3/21:9 完整可达。其余图形项已获复审接受，F-02 多状态截图本次经明确许可补齐，见新报告；不将旧重复图追写为有效。
@@ -56,18 +60,18 @@
 | Windows GUI 补验 | 三比例、每角色各三次、原七入口、遮罩/取消及组件恢复 | `passed`，本次实际编辑器证据见 [完成报告](../reports/2026-10-28_issue-3_windows-gui-completion.md) |
 | Windows GUI 键盘补验 | Tab/四方向/Enter/Space/Escape、确认/取消及原介绍返回 | 本次明确许可后的真实可视 Cocos 预览 `passed`，19 图文件/像素哈希与内容分别核对，见 [新报告](../reports/2026-10-29_issue-3_f02-keyboard-acceptance.md)；旧 40—54 无效及内嵌焦点失败保留，不修改输入代码 |
 | Windows GUI 启停/清理 | 两次完整编辑器运行/停止、正常退出和无残留 | `passed`，两次均在编辑器完成；旧/新进程树正常退出后 Cocos/项目窗口/7456 监听=0，3 条引擎警告保留 |
-| Windows GUI / FEAT-003 | 两角色分别进入同一真实游戏/测试场景并返回（AC-02） | `not_run`，待 FEAT-003 |
+| Windows GUI / FEAT-003 | 两角色分别进入同一真实游戏/测试场景并返回（AC-02） | `passed`，本次双角色三比例及各三次真实往返，见演示报告 |
 | 微信真机（需要时） | 触控区域/文字/美术在不同分辨率下正确 | `not_run` |
 
 **Mac 禁止擅自启动 Cocos、浏览器、微信开发者工具或 GUI 调试。** 未验证部分始终记 `not_run` 或 `blocked`，不能因写完本 Feature 就标通过。
 
-AC-01/04 的身份与重入、AC-05 的三比例/重复往返/交互/组件/启停证据见 [GUI 完成报告](../reports/2026-10-28_issue-3_windows-gui-completion.md)，AC-03 仍是原开发报告的纯模型非法 ID 测试。AC-02 未完成，FEAT-002 整体仍以 FEATURES 的 in_progress 为准。
+AC-01/04 的身份与重入、AC-05 的三比例/重复往返/交互/组件/启停证据见 [GUI 完成报告](../reports/2026-10-28_issue-3_windows-gui-completion.md)，AC-03 仍是原开发报告的纯模型非法 ID 测试。AC-02 由本次演示报告补齐；Feature 状态唯一见 FEATURES。
 
 F-02 原静态修复轮次的更正见 [键盘证据补充报告](../reports/2026-10-29_issue-3_f02-keyboard-evidence.md)：旧报告的键盘通过声明不构成独立证据；保留原始失败归档，当时采集流程修复不等于真实按键已重新验收。
 
 上段是静态修复轮次边界；本次新许可后真实补验另见 [F-02 键盘验收报告](../reports/2026-10-29_issue-3_f02-keyboard-acceptance.md)。本轮只补键盘，不重新开发已审逻辑，也不重复已审编辑器生命周期/三比例。AC-02 与整个 Feature 的完成条件不变。
 
-本次专项验收、精确提交边界和最终安全 CLI 见 [P1-03 收尾报告](../reports/2026-10-29_issue-3_closeout.md)。本次不修改 AC-02，也不将整个 Feature 标 done。
+本次专项验收、精确提交边界和最终安全 CLI 见 [P1-03 收尾报告](../reports/2026-10-29_issue-3_closeout.md)。当时未修改 AC-02；本次 P1-04 的验收独立记录，不覆盖历史证据。
 
 ## 7. 依赖、风险、文档联动
 

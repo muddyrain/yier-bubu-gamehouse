@@ -1,6 +1,6 @@
 # FEAT-001 — 游戏大厅与目录
 
-> FEAT-001 · v1.12 · 2026-10-29 · 所属阶段：P1 · 负责人：待定。**实施状态只在 `docs/FEATURES.md` 维护。** P1-02 专项已验收；P1-03 的 F-02 已补真实键盘证据；完整 AC-03 仍待 FEAT-003。
+> FEAT-001 · v1.14 · 2026-10-30 · 所属阶段：P1 · 负责人：待定。**实施状态只在 `docs/FEATURES.md` 维护。** P1-02 专项已验收；P1-03 的 F-02 已补真实键盘证据；P1-04 已补真实测试模块往返 AC-03；正式四款仍开发中。
 
 ## 1. 目标与用户故事
 
@@ -39,13 +39,15 @@
 - GameId / GameCatalogEntry
 - GameModuleRegistry 接口由 FEAT-003 定义
 - 角色选择依赖 FEAT-002
-- LobbyModel 提供只读目录/角色身份、导航与本地选角状态转换；LobbyView 持有 UI 节点、订阅及实例内确认值，通过只读 getter 预留 FEAT-003 接入。没有 GameModuleRegistry、GameSession 或 RoomService 的伪实现。
+- LobbyModel 提供只读目录/角色身份、导航与本地选角状态转换；LobbyView 持有 UI 节点、订阅及实例内确认值，通过只读 getter 接入 FEAT-003 开发测试。P1-04 已有实际注册/局部会话/模块源码，RoomService 仍未实现；真实双角色往返已验收，见下方最新证据。
+
+P1-04 新增独立开发测试入口，原七入口/选角仍保留；测试模块活动时大厅隐藏并拒绝自身输入，退出恢复相同实例。上文的 P1-02/03 边界保留为历史；新增注册/会话和实际操作模块源码见 [本轮报告](../reports/2026-10-29_issue-4_game-lifecycle.md)。2026-10-30 已真实完成三比例、双方各三次往返、组件恢复及两次编辑器预览启停，支持 AC-03，见 [演示报告](../reports/2026-10-30_issue-4_visible-demo.md)。测试模块无音频；不宣称正式游戏或长期泄漏完成。
 
 ## 5. 验收标准
 
 - [x] **AC-01**：首页同时正确出现一二和布布，角色视觉/名称无颠倒。
 - [x] **AC-02**：四款首发卡片都有准确名称与 implemented/coming-soon 状态。
-- [ ] **AC-03**：可从进入后的游戏/测试场景返回，不残留多余场景实例或音频。
+- [x] **AC-03**：可从进入后的游戏/测试场景返回，不残留多余场景实例或音频。
 - [x] **AC-04**：未实现卡片不会假装可玩，给予准确提示。
 - [x] **AC-05**：游戏/帮助/设置/好友提示连续打开和关闭至少三次，无叠加面板、重复回调或不可返回状态；纯逻辑与真实引擎分别验证。
 
@@ -71,5 +73,5 @@
 
 - 关键依赖：无硬依赖；联调需 FEAT-002、FEAT-003。
 - 风险与待确认：首屏包体、角色美术授权、横屏不同宽高比及安全区适配。
-- [导入与暂停报告](../reports/2026-10-27_issue-2_windows-gui-import.md) 保留该轮 not_run；[GUI 验收报告](../reports/2026-10-27_issue-2_windows-gui-acceptance.md) 支持 AC-01/02/04/05：21 次真实开关未观察到叠加或重复响应，不宣称做过堆快照/长期泄漏审计。真正游戏往返 AC-03 仍待 FEAT-003，Feature 不标 done。
+- [导入与暂停报告](../reports/2026-10-27_issue-2_windows-gui-import.md) 保留该轮 not_run；[GUI 验收报告](../reports/2026-10-27_issue-2_windows-gui-acceptance.md) 支持 AC-01/02/04/05：21 次真实开关未观察到叠加或重复响应，不宣称做过堆快照/长期泄漏审计。AC-03 的新证据见本次演示报告；历史轮次不追写为通过。
 - 变更联动：`docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/TESTING.md`、`docs/FEATURES.md`、`docs/PLAN.md`（阶段变化时）、`docs/CHANGELOG.md`、任务报告。

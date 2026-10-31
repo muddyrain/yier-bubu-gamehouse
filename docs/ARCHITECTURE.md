@@ -1,6 +1,6 @@
 # 目标系统架构与依赖边界
 
-> DOC-ARCH · v1.16 · 2026-10-29 · P1-03 本地选角与 F-02 真实键盘证据；真实游戏生命周期仍为计划，未实现。
+> DOC-ARCH · v1.19 · 2026-10-30 · P1-04 最小注册/局部会话/可操作模块已真实运行验收；目标架构并非全部实现。
 
 ## 1. 分层与模块图（目标）
 
@@ -93,7 +93,25 @@ scripts/                 # 检查/构建脚本，经安全审查才执行
 
 **不得只为符合架构图而创建大量空文件。** 当前没有上述 `core/characters/platform/games/ui`、`server/`、`shared/` 或 `scripts/` 产品模块；安全工具实际放在 `tools/`。
 
+### P1-04 现有最小实现
+
+`GameLifecycle.ts` 提供 GameRegistry/GameFlow/GameSession；`CounterModel.ts` 为真实计数规则；`DevelopmentModule.ts` 在现有 Canvas 下创建独立全屏操作场及自己的按钮/键盘/尺寸订阅。采用模块节点切换，**不调用 director.loadScene**；保留 Lobby.scene/Startup.scene 和 UUID，避免为计数测试引入跨场景全局传递器。它是会响应操作、目标移动与暂停的玩法模块，不是介绍面板；真实引擎往返仍 not_run。
+
+LobbyView 从 getConfirmedCharacter() 复制并校验稳定 ID，才启动 development-counter / solo；GameSession 冻结 sessionId/gameId/mode/characterId，不持有 Lobby/选择对象。原四卡目录和选角状态机不改。运行时 GameId 是注册表验证的稳定字符串，Catalog 的四 ID 类型保持原定义；coop/versus 只类型扩展，未注册不启动。
+
+GameFlow 每个 Lobby 实例唯一持有当前记录，先占 loading 再工厂/load/enter，成功为 running；pause/resume 幂等。exit 使取消标记生效、进入 exiting，分别尝试 exit/dispose，再置 idle；迟到加载按记录身份拒绝 enter 或覆盖新局。加载/进入/暂停/继续异常会清理并回大厅，清理异常仍记录原错并封闭后续启动，避免叠加未释放模块。原始异常由 Lobby 的 console.error 留存。
+
+F-01 明确协作式资源归属：每次 start 创建独立 LoadResources，异步 load 取得资源后立即 `cancellation.retain(() => 释放该具体句柄)`，在保存、使用或下一次 await 之前登记。true 才可使用；false 表示取消且已尝试立即释放，加载方停止使用。登记资源由该作用域独占释放，不能同时由 module.dispose 再释放。finish 先封闭作用域，原 exit/dispose 仍只各执行一次，再逆序释放已登记句柄并清空队列；取消后作用域保持封闭，旧 Promise 随后取得资源时 retain 即时释放，不依赖 cleaned 标记再次调用模块销毁，也不读/改变新 current。正常退出、加载失败、owner 销毁遵循同一资源规则；释放错误记录原错且继续其余释放，当前退出阶段失败则沿用禁止重开策略。迟到释放错误只记旧错误，不篡改新会话或伪称资源已释放。
+
+此协议不强制终止 Promise，也不能发现未登记的异步资源。异步模块须遵守登记/停止使用规则，释放函数只捕获该次的具体资源，不能访问“当前 session”或新实例。当前 DevelopmentModule 仍同步建树，无异步资产取得；节点/订阅继续由自己的 exit/dispose 管理，不改场景/Meta 或引入 Asset Bundle 框架。实际复现、资源存活负向断言与边界见 [F-01 报告](reports/2026-10-30_issue-4_f01-load-cancellation.md)。
+
+模块退出先解除同一批输入/尺寸事件并隐藏节点，dispose 对自建根节点 strict isValid 后调用 destroy，由引擎延迟销毁时脱离父节点；不在父节点停用期间主动 removeFromParent，避免真实停止预览时的层级错误。没有 update、计时器、音频/物理、网络、持久存档或全局 GameManager。Lobby 在模块中隐藏且拒绝自己的键盘输入，禁用/销毁会关闭模块；返回同一实例保留已确认角色，计数清零，重新预览中立。停止缺陷与复验见 [演示报告](reports/2026-10-30_issue-4_visible-demo.md)。
+
+`CharacterVisualRenderer.create(parent, CharacterId, Box)` 由大厅、选角与操作场共用，原几何形状不改；以后可替换这一实现而不改 ID/session/规则。并非完整图像/动画/异步 Asset 系统。下面保留的 P1-03 规划属于历史背景，实际进度以本节和 [开发报告](reports/2026-10-29_issue-4_game-lifecycle.md) 为准。
+
 ## 3. 关键契约（语义级，P1 再确定 TS 签名）
+
+### 其余目标契约
 
 - `CharacterId = yier | bubu`：唯一稳定角色 ID，文案与头像独立；在联机中由服务端校验选角占用。
 - `GameId`：稳定 ID，暂定 `tower-defense | gold-miner | merge | snake`；存档不能依赖屏幕标题。

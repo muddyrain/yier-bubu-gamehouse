@@ -1,17 +1,18 @@
 # Feature 总表、编号与实施状态（唯一 Feature 状态源）
 
-> DOC-FEATURES · v1.7 · 2026-10-29。P1-03 专项已获完整复审并按本次授权收尾；Feature 状态仍按全部验收范围填写，FEAT-002 AC-02 待真实游戏集成。单项详见 `docs/features/`。
+> DOC-FEATURES · v1.10 · 2026-10-30。P1-04 已有真实运行证据；仅满足全部验收项的 Feature 标 done。单项详见 `docs/features/`。
 
-全项目首发界面统一横屏，以 1280×720 为设计基准，暂不做单游戏动态旋转，见 [ADR-0003](decisions/ADR-0003-landscape-first.md)。P1-03 仅实现大厅内本地选角；FEAT-002 AC-02 真实游戏集成仍待 FEAT-003，不提前完成生命周期、联机或发布质量功能。
+全项目首发界面统一横屏，以 1280×720 为设计基准，暂不做单游戏动态旋转，见 [ADR-0003](decisions/ADR-0003-landscape-first.md)。P1-04 已实测双角色进入/操作/返回同一测试模块，补齐 FEAT-001 AC-03、FEAT-002 AC-02；各自现有验收项完成。正式四款、联机与发布质量仍未实现；FEAT-003 的跨正式游戏隔离/获权图像替换仍未完成。证据见 [演示报告](reports/2026-10-30_issue-4_visible-demo.md)。
 
+开发优先级按 PLAN：P1-04 真实演示及矩阵已完成；F-01 未重复重构。下一阶段优先 FEAT-005 单关精致可玩切片，再扩五关；第一版不以前置存档/奖励架构拖延试玩。原稿/可用许可取得前，现有占位不冒充最终原作。
 
 | ID | 功能与详情 | 优先级 | 阶段 | 状态 | 依赖 |
 | --- | --- | --- | --- | --- | --- |
-| FEAT-001 | [游戏大厅与目录](features/FEAT-001-game-lobby.md) | P0 | P1 | `in_progress` | 无 |
-| FEAT-002 | [一二/布布选角](features/FEAT-002-character-selection.md) | P0 | P1 | `in_progress` | 001 |
-| FEAT-003 | [小游戏生命周期和注册](features/FEAT-003-game-module-lifecycle.md) | P0 | P1 | `planned` | 001 |
+| FEAT-001 | [游戏大厅与目录](features/FEAT-001-game-lobby.md) | P0 | P1 | `done` | 无 |
+| FEAT-002 | [一二/布布选角](features/FEAT-002-character-selection.md) | P0 | P1 | `done` | 001 |
+| FEAT-003 | [小游戏生命周期和注册](features/FEAT-003-game-module-lifecycle.md) | P0 | P1 | `in_progress` | 001 |
 | FEAT-004 | [玩家进度和存档](features/FEAT-004-save-system.md) | P0 | P1 | `planned` | 002、003 |
-| FEAT-005 | [一二布布守护小屋](features/FEAT-005-tower-defense.md) | P0 | P2/P4 | `planned` | 002–004 |
+| FEAT-005 | [一二布布守护小屋](features/FEAT-005-tower-defense.md) | P0 | P2/P4 | `planned` | 第一版 002、003；保存扩展 004 |
 | FEAT-006 | [一二布布黄金矿工](features/FEAT-006-gold-miner.md) | P0 | P3/P4 | `planned` | 002–004 |
 | FEAT-007 | [一二布布合成乐园](features/FEAT-007-merge-game.md) | P1 | P4 | `planned` | 002–004 |
 | FEAT-008 | [一二布布贪吃蛇](features/FEAT-008-snake-game.md) | P1 | P4 | `planned` | 002–004 |

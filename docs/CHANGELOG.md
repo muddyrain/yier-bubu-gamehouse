@@ -1,9 +1,15 @@
 # 文档与产品决策变更记录
 
-> DOC-CHANGELOG · v1.22 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
+> DOC-CHANGELOG · v1.27 · 日期倒序记录。实现任务的详细验证证据写在报告，不在这里重复。
 
 | 日期 | 类型 | 影响文件 | 原因与变化 | 验证/待验证 |
 | --- | --- | --- | --- | --- |
+| 2026-10-30 | P1-04-final-review-preparation | PLAN、INDEX、本次报告与本机审查包 | 仅核对停止预览修复、完整当前源码/四份 Meta、F-01 不变及拟提交范围；混合文档在副本中排除独立角色研究，原文保留 | 必要安全 CLI/投影差异/哈希结果见报告；本轮不运行 GUI、不美化或重构，停止等待最后差异人工复审，无 Git 写入 |
+| 2026-10-30 | P1-04-visible-demo-complete | DevelopmentModule、四份脚本 Meta、README、PLAN、FEATURES、FEAT-001/002/003、ARCHITECTURE、TESTING、INDEX、本次演示报告 | 恢复后完成组件恢复；真实停止缺陷最小修复为由引擎延迟销毁时脱离父节点，未改 F-01；四份 Meta 仅 imported=true、UUID 不变。单关路线保留，未重做美术 | 双角色/三比例/各三次及修复导入后两次预览启停通过，54 原图解码/去重；修复后 tsc/21 unittest 通过，IPC 警告/失败帧保留。正常退出无残留；P1-04 本地 done，未提交/未关闭 Issue；跨正式游戏/素材替换/真机未验 |
+| 2026-10-30 | P1-04-visible-demo-interrupted | README、PLAN、本次演示报告；本机真实截图/输入/日志 | 本次明确许可后完成 16:9 双角色演示、三比例、双方各三次往返和原入口回归；保留预览容器旧宽裁切与一次截图命名错误，未改产品代码 | 组件恢复/两次完整编辑器启停和退出未完成；前台被中断后停止输入/截图，编辑器仍运行。P1-04 in_progress，无录屏或 Git 写入 |
+| 2026-10-30 | P1-04-visible-demo-priority | README、PLAN、FEATURES、FEAT-003/005、PRODUCT、TESTING、INDEX、本次演示报告 | F-01 已外部源码复审通过；改为先 16:9 双角色真实演示再补矩阵，GUI/截图须本次许可。下一阶段先守护小屋一地图/一关/两防御/两敌人/三波及统一高品质 2D UI，再扩五关；不重做整体美术 | 现有 3.8.8/场景就绪，真实类型检查 passed；GUI/新截图/五项视觉评估待许可，详细验证见报告；代码/研究/私有配置/历史保留，无 Git 写入 |
+| 2026-10-30 | P1-04-F01-load-cancellation | GameLifecycle、原生命周期套件/包装器、ARCHITECTURE、FEAT-003、TESTING、PLAN、README、INDEX、开发报告与 F-01 报告 | 每次加载独立登记资源；取消前资源退出回收，取消后迟到取得即时释放且不操作新会话；原 exit/dispose 次数与旧断言保留，无新玩法 | 修复前真实资源残留 failed 保留；修复后 21 unittest/生命周期 23 组及 TS 5.8.2、文档/编码/Git 安全实测见报告；本轮 GUI not_run，无 Git 写入 |
+| 2026-10-29 | P1-04-game-lifecycle | LobbyView、四份新脚本/Meta、生命周期测试、FEAT-001/002/003、FEATURES、PLAN、ARCHITECTURE、ART_ASSETS、ASSET_LICENSES、TESTING、README、INDEX、开发报告 | 在既有 Lobby/选角上接入单活动注册/复制角色会话和可操作开发模块；四款正式游戏仍开发中，复用原几何；保留独立调研与历史 | 21 unittest（原 20 + 新 20 组逻辑）、tsc/文档/编码/忽略和审查包实测见报告；真实 GUI/跨正式游戏/素材替换 not_run，无 Git 写入 |
 | 2026-10-29 | P1-03-closeout | README、PLAN、FEATURES、FEAT-002、TESTING、INDEX、CHANGELOG、收尾报告及已审 29 路径 | 用户接受源码/F-02/工具与范围复审，明确授权索引精确暂存、提交及普通推送，远端确认后关闭 Issue #3；P1-03 done，P1/FEAT-001/002 保持 in_progress | 安全 CLI、暂存哈希/差异及独立研究原文保留见报告；不重跑 GUI，不提交研究/.url/缓存/私有配置，不开始 FEAT-003 |
 | 2026-10-29 | P1-03-precommit-scope | PLAN、INDEX、本轮范围报告及本机拟提交副本/补充审查包 | 用户确认 F-02 人工验收后，仅无 GUI 核对提交范围；分离选角、素材调研及后续规划，保留全部原文；三份证据工具首次提供完整源码审查 | 无暂存或提交；实际安全 CLI、精确拆分/包校验见报告；工具待复审，P1/P1-03 与 FEAT-002 不提前 done |
 | 2026-10-29 | P1-03-F02-keyboard-acceptance | README、PLAN、FEATURES、FEAT-001/002、ARCHITECTURE、TESTING、INDEX、键盘验收报告与本机证据包 | 用户本次明确许可后补关键键盘状态，19 张真实 JPEG 的画面/真实尺寸/文件及像素哈希分别核对，旧 invalid_capture 不覆盖；选角源码无修改 | 键盘、确认布布、取消草稿与介绍开关有新证据；正常退出后进程/项目窗口/7456=0；原始日志与工具失败保留，最终安全 CLI 见报告；P1-03 in_progress，停止 Code Review，无 Git 写入/下一功能 |

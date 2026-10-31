@@ -7,6 +7,10 @@ import {
     characterStatus, fitDesign, moveFocus, transitionLobby,
 } from './LobbyModel';
 import type { AppAction, Box, CharacterChoice, CharacterEntry, LobbyState } from './LobbyModel';
+import { DEVELOPMENT_GAME_ID, GameFlow, GameRegistry } from './GameLifecycle';
+import type { FlowSnapshot } from './GameLifecycle';
+import { DevelopmentModule } from './DevelopmentModule';
+import { characterVisuals } from './CharacterVisual';
 
 const { ccclass } = _decorator;
 const INK = '#40382F';
@@ -14,11 +18,12 @@ const MUTED = '#74685B';
 const PAPER = '#FFFCF6';
 const ACCENT = '#4B775F';
 
+type ViewAction = AppAction | { readonly type: 'development-test' };
 interface Control {
     readonly node: Node;
     readonly graphics: Graphics;
     readonly button: Button;
-    readonly action: AppAction;
+    readonly action: ViewAction;
     readonly fill: string;
     readonly box: Box;
     readonly click: () => void;
@@ -47,8 +52,10 @@ export class LobbyView extends Component {
     private state: LobbyState = INITIAL_LOBBY;
     private focusIndex = 0;
     private panelFocusIndex = 0;
+    private gameFlow!: GameFlow;
+    private launchStatus!: Label;
 
-    /** Immutable preference for a future FEAT-003 caller, never a game session or saved profile. */
+    /** Immutable preference copied into each GameSession; never a saved profile. */
     public getConfirmedCharacter(): CharacterChoice | null {
         return this.state.choice;
     }
@@ -81,14 +88,23 @@ export class LobbyView extends Component {
         }
         // Keep the original seven controls' keyboard order; append the new entry.
         this.homeControls.push(this.characterEntry);
-        this.label(this.root, '全部游戏开发中 · 暂无可继续的存档', 0, -284, 1100, 30, 19, MUTED);
-        this.label(this.root, '原创几何占位 · 正式角色美术与玩法尚未开放', 0, -319, 1100, 26, 16, MUTED);
+        const test = this.control(this.root, 'DevelopmentEntry', { x: -176, y: -282, width: 760, height: 48 },
+            { type: 'development-test' }, '#D8E4D9');
+        this.homeControls.push(test);
+        this.label(test.node, '开发测试 · 进入操作场（先确认角色）', 0, 0, 736, 38, 21, INK);
+        this.label(this.root, '四款正式游戏开发中\n暂无可继续的存档', 420, -282, 320, 54, 18, MUTED);
+        this.launchStatus = this.label(this.root, '开发验证 / 非正式游戏 · 使用既有原创几何占位', 0, -329, 1160, 26, 17, MUTED);
         this.createNotice();
         this.createCharacterSelection();
+        this.gameFlow = new GameFlow(new GameRegistry([{ id: DEVELOPMENT_GAME_ID, modes: ['solo'],
+            create: () => new DevelopmentModule(this.node, { pause: () => this.gameFlow.pause(),
+                resume: () => this.gameFlow.resume(), exit: () => this.gameFlow.exit() }) }]),
+        state => this.onGameState(state), error => console.error('[P1-04] lifecycle error', error));
     }
 
     protected onEnable(): void {
         this.root.active = true;
+        this.launchStatus.string = this.gameFlow.snapshot.error ?? '开发验证 / 非正式游戏 · 使用既有原创几何占位';
         for (const control of this.controls) control.node.on(Button.EventType.CLICK, control.click, this);
         this.node.on(Node.EventType.SIZE_CHANGED, this.fit, this);
         input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
@@ -98,6 +114,7 @@ export class LobbyView extends Component {
     }
 
     protected onDisable(): void {
+        this.gameFlow?.exit();
         for (const control of this.controls) control.node.off(Button.EventType.CLICK, control.click, this);
         this.node.off(Node.EventType.SIZE_CHANGED, this.fit, this);
         input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
@@ -107,6 +124,7 @@ export class LobbyView extends Component {
     }
 
     protected onDestroy(): void {
+        this.gameFlow?.dispose();
         // Scene teardown may have already destroyed this owned child.
         if (isValid(this.root, true)) this.root.destroy();
     }
@@ -137,19 +155,7 @@ export class LobbyView extends Component {
     }
 
     private bear(parent: Node, character: CharacterEntry, box: Box): void {
-        const face = this.nodeBox(parent, character.id, box);
-        const pen = face.addComponent(Graphics);
-        pen.fillColor = Color.fromHEX(new Color(), character.color);
-        pen.circle(-31, 47, 17);
-        pen.circle(31, 47, 17);
-        pen.ellipse(0, -28, 39, 30);
-        pen.circle(0, 14, 41);
-        pen.fill();
-        pen.fillColor = Color.fromHEX(new Color(), INK);
-        pen.circle(-13, 20, 3);
-        pen.circle(13, 20, 3);
-        pen.ellipse(0, 5, 5, 3);
-        pen.fill();
+        characterVisuals.create(parent, character.id, box);
     }
 
     private createNotice(): void {
@@ -193,7 +199,12 @@ export class LobbyView extends Component {
         this.label(this.reselect.node, '再次选择', 0, 0, 184, 40, 22, INK);
     }
 
-    private dispatch(action: AppAction): void {
+    private dispatch(action: ViewAction): void {
+        if (this.gameFlow.snapshot.stage !== 'idle') return;
+        if (action.type === 'development-test') {
+            if (this.state.screen.kind === 'home') void this.gameFlow.start(DEVELOPMENT_GAME_ID, 'solo', this.getConfirmedCharacter());
+            return;
+        }
         const previous = this.state.screen;
         this.state = transitionLobby(this.state, action);
         const next = this.state.screen;
@@ -203,13 +214,23 @@ export class LobbyView extends Component {
         this.render();
     }
 
+    private onGameState(state: FlowSnapshot): void {
+        console.info('[P1-04] lifecycle', state.stage, state.session?.sessionId ?? 'none');
+        if (!this.enabledInHierarchy) return;
+        this.root.active = state.stage === 'idle' || state.stage === 'loading';
+        this.launchStatus.string = state.error ?? (state.stage === 'loading' ? '正在进入开发测试 · Esc 可取消'
+            : '开发验证 / 非正式游戏 · 使用既有原创几何占位');
+        this.render();
+    }
+
     private render(): void {
         const screen = this.state.screen;
         const open = screen.kind !== 'home';
         this.overlay.active = open;
         this.noticePanel.active = screen.kind === 'notice';
         this.characterPanel.active = screen.kind === 'characters';
-        for (const control of this.homeControls) control.button.interactable = !open;
+        const available = this.gameFlow.snapshot.stage === 'idle';
+        for (const control of this.homeControls) control.button.interactable = !open && available;
         this.back.button.interactable = screen.kind === 'notice';
         const choosing = screen.kind === 'characters' && screen.phase === 'choosing';
         this.characterBack.button.interactable = screen.kind === 'characters';
@@ -240,6 +261,7 @@ export class LobbyView extends Component {
     }
 
     private activeControls(): Control[] {
+        if (this.gameFlow?.snapshot.stage !== 'idle') return [];
         if (this.state.screen.kind === 'home') return this.homeControls;
         if (this.state.screen.kind === 'notice') return [this.back];
         // Neutral initial focus on Back. Disabled/hidden controls cannot receive keyboard input.
@@ -248,6 +270,10 @@ export class LobbyView extends Component {
     }
 
     private onKeyDown(event: EventKeyboard): void {
+        if (this.gameFlow.snapshot.stage !== 'idle') {
+            if (this.gameFlow.snapshot.stage === 'loading' && event.keyCode === KeyCode.ESCAPE) this.gameFlow.exit();
+            return;
+        }
         if (event.keyCode === KeyCode.ESCAPE) {
             this.dispatch({ type: 'close' });
             return;
@@ -287,7 +313,7 @@ export class LobbyView extends Component {
         return label;
     }
 
-    private control(parent: Node, name: string, box: Box, action: AppAction, fill: string): Control {
+    private control(parent: Node, name: string, box: Box, action: ViewAction, fill: string): Control {
         const node = this.nodeBox(parent, name, box);
         const graphics = node.addComponent(Graphics);
         const button = node.addComponent(Button);
